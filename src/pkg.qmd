@@ -1,0 +1,16 @@
+---
+title: "Managing Julia packages on HPC using pkg.nf"
+engine: knitr
+format: html
+---
+
+## Example
+
+We assume we are at the root of a nextflow repository containing `nf-nest` 
+as a git submodule:
+
+```{bash}
+ls
+```
+
+
