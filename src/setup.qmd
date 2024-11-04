@@ -1,0 +1,45 @@
+---
+title: "Setting up your account on Sockeye"
+engine: knitr
+format: html
+---
+
+## Allocation code 
+
+Scripts in nf-nest may need to know your cluster allocation code. 
+
+To set the variable in your current session, use:
+
+```{bash}
+export ALLOCATION_CODE=my-alloc-code
+```
+
+To set this variable automatically next time you login:
+
+```
+echo "export ALLOCATION_CODE=my-alloc-code" >> ~/.bashrc
+```
+
+
+## TODO
+
+- basic modules
+
+- Github setup
+
+- Java
+
+- Julia
+
+- symlinks
+
+- aliases
+
+- allocation code 
+
+- scripts
+    - create-exp-repo
+
+- VS Code
+
+- Docker

@@ -1,3 +1,7 @@
 src/.Rproj.user
 src/pkg_files
 pkg.html
+*.html
+*.css
+*.js
+*.woff

@@ -7,10 +7,9 @@ format: html
 ## Example
 
 We assume we are at the root of a nextflow repository containing `nf-nest` 
-as a git submodule:
+as a git submodule. 
 
-```{bash}
-ls
+```{bash echo = F, eval = T}
+rm -rf experiment_repo
 ```
-
 
