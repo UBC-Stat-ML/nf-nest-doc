@@ -1,8 +1,0 @@
----
-title: "Launching an experiment on an HPC cluster"
-engine: knitr
-format: html
-execute: 
-  cache: false
----
-

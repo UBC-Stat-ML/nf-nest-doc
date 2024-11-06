@@ -1,0 +1,28 @@
+project:
+  type: website
+
+website:
+  title: "nf-nest"
+  sidebar:
+    collapse-level: 1
+    contents:
+      - text: "Intro"
+        file: intro.qmd
+      - text: "Setup"
+        file: setup.qmd
+      - text: "Create an experiment repo"
+        file: create-exp-repo.qmd
+      - text: "Launch an experiment"
+        file: launch.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    linkcolor: black
+
+editor: source
+
+execute: 
+  cache: true

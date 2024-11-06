@@ -1,0 +1,36 @@
+---
+title: "Creating an experiment repo"
+engine: knitr
+format: html
+execute: 
+  cache: false
+---
+
+```{bash echo = F, eval = T}
+rm -rf experiment_repo
+```
+
+## Overview
+
+We use the term "experiment repo" for a git repository that 
+contains the plumbing required for a numerical experiment. 
+
+It consists in a git repository with:
+
+- the `nextflow` executable and its configuration, `nextflow.config`;
+- a git submodule, `nf-nest` containing useful tools; 
+- your `.nf` files and other supporting files. 
+
+This pages explains how to setup an experiment repo.
+
+
+## Instructions {#sec-instructions}
+
+For quick setup, run the following commands:
+
+```{bash output = F}
+#| eval: true
+#| file: create-exp-repo.sh
+```
+
+

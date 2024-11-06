@@ -1,0 +1,76 @@
+---
+title: "Launching an experiment"
+engine: knitr
+format: html
+execute: 
+  cache: false
+---
+
+```{bash echo = F, eval = T, output = F}
+rm -rf experiment_repo
+./create-exp-repo.sh
+```
+
+## Overview 
+
+We show how to launch an "experiment", i.e., a nextflow script. 
+
+We cover two ways to launch an experiment:
+
+1. **Local:** where all processes (nodes in the workflow graph) run in the same machine. 
+2. **Cluster** where each node in the graph can run in different machines in a cluster. 
+
+Method 1 is useful to run experiments on a laptop and for prototyping. 
+
+Surprisingly, thanks to nextflow, method 2 only involves adding the command line option 
+`-profile cluster`. This is because nextflow takes care of generating submission 
+scripts, transferring files and orchestring everything. 
+
+
+## Example nextflow script
+
+The `nf-nest` repo contains a small example nextflow script, which we will use to 
+demonstrate the two ways to launch an experiment. Here is the script for reference:
+
+```{bash}
+#| eval: false
+#| file: experiment_repo/nf-nest/test.nf
+```
+
+
+
+## Local execution
+
+Use the following command to run the nextflow script locally:[^1]
+
+[^1]: The option `-ansi-log false` is to avoid interactive progress output 
+      which are not looking great in a notebook. 
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/test.nf -ansi-log false
+```
+
+
+## Cluster execution
+
+To run on a cluster, add the argument `-profile cluster` which 
+instructs nextflow to use the configs in section `cluster { ... }` 
+of the file `nextflow.config` created 
+[in the setup instructions](create-exp-repo.qmd#instructions).[^2] 
+
+[^2]: In the previous section ("local execution"), where we did not 
+      specify a `-profile`, the default profile named `standard` is 
+      used.
+
+Here is a minimal example:
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/test.nf -profile cluster -ansi-log false
+```
+
+
+## Keeping long cluster executions alive 
+
+TODO: screen and tmux

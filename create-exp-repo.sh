@@ -8,3 +8,6 @@ curl -s https://get.nextflow.io | bash
 
 # add nf-nest utilities
 git submodule add https://github.com/UBC-Stat-ML/nf-nest.git
+
+# use template for nextflow configurations
+cp nf-nest/default.config nextflow.config

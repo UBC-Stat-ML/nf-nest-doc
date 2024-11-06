@@ -1,0 +1,50 @@
+---
+title: "Intro"
+engine: knitr
+format: html
+execute: 
+  cache: false
+---
+
+## Context
+
+Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. 
+
+
+## Goal
+
+This repository documents `nf-nest` a suite of utilities to help you succeed in your 
+numerical experimental campaigns. 
+
+
+## Technology stack
+
+`nf-nest` uses the following open source projects:
+
+- Nextflow: can be thought of as an "operating system" for coordinating numerical experiments. 
+- Julia: a programming language to unlock full access to high performance computation on both CPUs and GPUs. 
+
+While some features of `nf-nest` are Julia specific, other parts are language agnostic. 
+
+
+## Background
+
+### Scientific workflow
+
+A scientific workflow is a directed acyclic graph where each node is a process and each edge 
+between node $n$ to $n'$
+denote that at least one output of process $n$ is fed as an input to process $n'$. 
+
+TODO: prototype example (preprocess / precompile / run array of exeriments / combine / plot) / figure
+
+TODO: mention benefits - job submission of each node at right time, file system issues, retries, repro, etc 
+
+
+### Nextflow
+
+TODO: pointer to doc, etc. 
+
+
+### Julia 
+
+TODO: pointer to doc

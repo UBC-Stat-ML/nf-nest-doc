@@ -1,0 +1,54 @@
+---
+title: "Setting up your HPC account"
+engine: knitr
+format: html
+---
+
+## Overview
+
+You will need to go through these setup instructions before using nf-nest. 
+This needs to be done only once per user and per cluster.  
+
+
+## Allocation code 
+
+In some HPC such as UBC Sockeye, we need an allocation code to 
+submit to the job queue. 
+Scripts in nf-nest use an ENV variable called `ALLOCATION_CODE` to 
+find the allocation code. 
+
+To set the variable in your current session, use:
+
+```{bash}
+export ALLOCATION_CODE=my-alloc-code
+```
+
+To automatically set this variable for next time you login:
+
+```bash
+echo "export ALLOCATION_CODE=my-alloc-code" >> ~/.bashrc
+```
+
+
+## TODO
+
+- basic modules
+
+- Github setup
+
+- Java
+
+- Julia
+
+- symlinks
+
+- aliases
+
+- allocation code 
+
+- scripts
+    - create-exp-repo
+
+- VS Code
+
+- Docker

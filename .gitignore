@@ -5,3 +5,8 @@ pkg.html
 *.css
 *.js
 *.woff
+
+/.quarto/
+_site/*
+pkg_cache/*
+setup_cache/*
