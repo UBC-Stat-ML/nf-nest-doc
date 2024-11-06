@@ -1,9 +1,6 @@
 ---
 title: "Creating an experiment repo"
 engine: knitr
-format: html
-execute: 
-  cache: false
 ---
 
 ```{bash echo = F, eval = T}

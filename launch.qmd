@@ -1,9 +1,6 @@
 ---
 title: "Launching an experiment"
 engine: knitr
-format: html
-execute: 
-  cache: false
 ---
 
 ```{bash echo = F, eval = T, output = F}

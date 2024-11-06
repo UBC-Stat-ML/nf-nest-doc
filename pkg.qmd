@@ -1,15 +1,27 @@
 ---
-title: "Managing Julia packages on HPC using pkg.nf"
+title: "Managing Julia packages on HPC"
 engine: knitr
-format: html
 ---
+
+```{bash echo = F, eval = T, output = F}
+#rm -rf experiment_repo
+#./create-exp-repo.sh
+```
+
+## Overview 
+
+TODO: background on pkg, HPC limitations
+
 
 ## Example
 
 We assume we are at the root of a nextflow repository containing `nf-nest` 
-as a git submodule. 
+as a git submodule.  TODO: add this everywhere, with link to setup page
 
-```{bash echo = F, eval = T}
-rm -rf experiment_repo
+```{bash}
+cd experiment_repo
 ```
 
+```{julia}
+1+1
+```

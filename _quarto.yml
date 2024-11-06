@@ -8,12 +8,14 @@ website:
     contents:
       - text: "Intro"
         file: intro.qmd
-      - text: "Setup"
+      - text: "Setup HPC account"
         file: setup.qmd
       - text: "Create an experiment repo"
         file: create-exp-repo.qmd
       - text: "Launch an experiment"
         file: launch.qmd
+      - text: "Add Julia packages on HPC"
+        file: pkg.qmd
 
 format:
   html:
@@ -25,4 +27,6 @@ format:
 editor: source
 
 execute: 
-  cache: true
+  cache: false
+
+knitr: true

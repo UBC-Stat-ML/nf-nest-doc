@@ -1,7 +1,6 @@
 ---
 title: "Setting up your HPC account"
 engine: knitr
-format: html
 ---
 
 ## Overview
