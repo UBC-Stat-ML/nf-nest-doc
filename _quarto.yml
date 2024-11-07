@@ -6,9 +6,9 @@ website:
   sidebar:
     collapse-level: 1
     contents:
-      - text: "Intro"
+      - text: "Introduction"
         file: intro.qmd
-      - text: "Setup HPC account"
+      - text: "Setup your HPC account"
         file: setup.qmd
       - text: "Create an experiment repo"
         file: create-exp-repo.qmd
@@ -16,6 +16,8 @@ website:
         file: launch.qmd
       - text: "Add Julia packages on HPC"
         file: pkg.qmd
+      - text: "Prototypical pipeline"
+        file: example-pipeline.qmd
 
 format:
   html:
