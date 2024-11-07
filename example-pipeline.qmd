@@ -1,7 +1,13 @@
-
+---
+title: "Prototypical pipeline"
+engine: knitr
+---
 
 
 
 Design decisions:
 
 - On saving CSV used for plots. 
+
+
+TODO: -resume (can we make that by default)
