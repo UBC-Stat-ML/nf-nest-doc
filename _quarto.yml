@@ -29,6 +29,6 @@ format:
 editor: source
 
 execute: 
-  cache: false
+  cache: true
 
 knitr: true

@@ -3,11 +3,6 @@ title: "Managing Julia packages on HPC"
 engine: knitr
 ---
 
-```{bash echo = F, eval = T, output = F}
-rm -rf experiment_repo
-./create-exp-repo.sh
-```
-
 ## Overview 
 
 TODO: something about how if you are on your laptop follow simpler instructions
@@ -15,16 +10,79 @@ TODO: something about how if you are on your laptop follow simpler instructions
 TODO: background on pkg, HPC limitations
 
 
+## Julia environment
+
+A Julia environment is a specification of all package 
+dependencies and their versions. 
+
+By convention, we will store it in a 
+directory called `experiment_repo/julia_env`.
+
+
 ## Adding a package
 
-We assume we are at the root of a nextflow repository containing `nf-nest` 
-as a git submodule.  TODO: add this everywhere, with link to setup page
+Then there are two syntaxes in Julia to install packages: the 
+interactive Julia package manager or using programmatic Pkg 
+syntax. We cover both below. 
+
+In both syntaxes, we first need to tell Julia which environment 
+to use. This is called "activating" an environment.
 
 
+### Interactive Julia package manager
+
+The most common method is to use the interactive Julia package 
+manager. To start it, type `]` followed by `enter`. 
+
+Activating is done with the `activate` keyword. 
+
+You can then add a package using the `add` command. The argument of 
+`add` can be either a registered Julia package, as in:
+
+```julia
+ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0 # Hold off precompile since we are in login node
+]
+activate experiment_repo/julia_env
+add Pigeons
+```
+
+or it can be a git repository, optionally with a specific 
+commit/tag:
+
+```julia
+add Example@0.5
+add Example#master
+add Example#c37b675
+add https://github.com/JuliaLang/Example.jl#master
+add git@github.com:JuliaLang/Example.jl.git
+add "git@github.com:JuliaLang/Example.jl.git"#master
+add https://github.com/Company/MonoRepo:juliapkgs/Package.jl
+```
+
+To exit the interactive Julia package manager, type `control-C`.
+
+
+### Programmatic interface
+
+Alternatively, a programmatic interface is also available 
+for scripting:
+
+```{julia output = F}
+ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0 # Hold off precompile since we are in login node
+using Pkg 
+Pkg.activate("experiment_repo/julia_env")
+Pkg.add("Pigeons")
+```
+
+
+## Precompilation on HPC
+
+Once we have downloaded the packages in the login node, 
+we now turn to the task of performing pre-compilation. 
 
 ```{bash}
-cd experiment_repo
-./nextflow run nf-nest/pkg.nf -profile cluster --packagesToAdd Pigeons
+cd experiment_repo 
+./nextflow run nf-nest/pkg.nf -profile cluster
 ```
 
 
@@ -33,7 +91,7 @@ cd experiment_repo
 TODO: how to test the Julia env interactively
 
 
-```{julia}
+```{julia output = F}
 using Pkg
 Pkg.activate("experiment_repo/julia_env")
 
@@ -42,6 +100,9 @@ pigeons(target = toy_mvn_target(1000))
 ```
 
 
-## Adding from a github repo
+## How does it work?
 
-TODO
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/pkg.nf
+```

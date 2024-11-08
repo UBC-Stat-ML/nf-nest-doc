@@ -3,11 +3,6 @@ title: "Launching an experiment"
 engine: knitr
 ---
 
-```{bash echo = F, eval = T, output = F}
-rm -rf experiment_repo
-./create-exp-repo.sh
-```
-
 ## Overview 
 
 We show how to launch an "experiment", i.e., a nextflow script. 
@@ -29,7 +24,7 @@ scripts, transferring files and orchestring everything.
 The `nf-nest` repo contains a small example nextflow script, which we will use to 
 demonstrate the two ways to launch an experiment. Here is the script for reference:
 
-```{bash}
+```{groovy}
 #| eval: false
 #| file: experiment_repo/nf-nest/examples/hello.nf
 ```
