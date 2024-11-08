@@ -31,21 +31,18 @@ demonstrate the two ways to launch an experiment. Here is the script for referen
 
 ```{bash}
 #| eval: false
-#| file: experiment_repo/nf-nest/test.nf
+#| file: experiment_repo/nf-nest/examples/hello.nf
 ```
 
 
 
 ## Local execution
 
-Use the following command to run the nextflow script locally:[^1]
-
-[^1]: The option `-ansi-log false` is to avoid interactive progress output 
-      which are not looking great in a notebook. 
+Use the following command to run the nextflow script locally:
 
 ```{bash}
 cd experiment_repo
-./nextflow run nf-nest/test.nf -ansi-log false
+./nextflow run nf-nest/examples/hello.nf
 ```
 
 
@@ -62,9 +59,9 @@ of the file `nextflow.config` created
 
 Here is a minimal example:
 
-```{bash}
+```{bash echo = -1}
 cd experiment_repo
-./nextflow run nf-nest/test.nf -profile cluster -ansi-log false
+./nextflow run nf-nest/examples/hello.nf -profile cluster 
 ```
 
 

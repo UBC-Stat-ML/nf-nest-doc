@@ -4,24 +4,44 @@ engine: knitr
 ---
 
 ```{bash echo = F, eval = T, output = F}
-#rm -rf experiment_repo
-#./create-exp-repo.sh
+rm -rf experiment_repo
+./create-exp-repo.sh
 ```
 
 ## Overview 
 
+TODO: something about how if you are on your laptop follow simpler instructions
+
 TODO: background on pkg, HPC limitations
 
 
-## Example
+## Adding a package
 
 We assume we are at the root of a nextflow repository containing `nf-nest` 
 as a git submodule.  TODO: add this everywhere, with link to setup page
 
+
+
 ```{bash}
 cd experiment_repo
+./nextflow run nf-nest/pkg.nf -profile cluster --packagesToAdd Pigeons
 ```
 
+
+## Testing your Julia environment interactively
+
+TODO: how to test the Julia env interactively
+
+
 ```{julia}
-1+1
+using Pkg
+Pkg.activate("experiment_repo/julia_env")
+
+using Pigeons
+pigeons(target = toy_mvn_target(1000))
 ```
+
+
+## Adding from a github repo
+
+TODO

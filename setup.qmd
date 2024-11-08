@@ -28,6 +28,23 @@ To automatically set this variable for next time you login:
 echo "export ALLOCATION_CODE=my-alloc-code" >> ~/.bashrc
 ```
 
+## Optional: disable fancy nextflow fancy output
+
+It can be useful to avoid nextflow's fancy progress output, 
+for example they do not work well in notebook or in 
+`screen`. 
+
+To disable in the current session, use:
+
+```{bash}
+export NXF_ANSI_LOG=false
+```
+
+To automatically set this variable for next time you login:
+
+```bash
+echo "export NXF_ANSI_LOG=false" >> ~/.bashrc
+```
 
 ## TODO
 
@@ -48,6 +65,6 @@ echo "export ALLOCATION_CODE=my-alloc-code" >> ~/.bashrc
 - scripts
     - create-exp-repo
 
-- VS Code
+- VS Code (resume, github credentials)
 
 - Docker
