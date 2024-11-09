@@ -9,3 +9,5 @@ pkg.html
 /.quarto/*
 _site/*
 *_cache/*
+
+/.quarto/

@@ -104,9 +104,3 @@ pigeons(target = toy_mvn_target(1000))
 ```
 
 
-## How does it work?
-
-```{groovy}
-#| eval: false
-#| file: experiment_repo/nf-nest/pkg.nf
-```

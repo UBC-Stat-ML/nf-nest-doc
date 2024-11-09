@@ -1,0 +1,24 @@
+---
+title: "Job cross products"
+engine: knitr
+---
+
+## Overview 
+
+TODO
+
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/many_jobs.nf
+```
+
+
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/many_jobs.nf -profile cluster
+```
+
+
+
