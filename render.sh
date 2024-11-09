@@ -1,3 +1,6 @@
 rm -rf experiment_repo
-./create-exp-repo.sh
+rm -rf *_cache
+rm -rf _site 
+rm -rf .quarto
+
 quarto render

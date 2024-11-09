@@ -1,5 +1,7 @@
 project:
   type: website
+  render:
+    - "*.qmd"
 
 website:
   title: "nf-nest"
@@ -7,17 +9,17 @@ website:
     collapse-level: 1
     contents:
       - text: "Introduction"
-        file: intro.qmd
+        file: 01_intro.qmd
       - text: "Setup your HPC account"
-        file: setup.qmd
+        file: 02_setup.qmd
       - text: "Create an experiment repo"
-        file: create-exp-repo.qmd
+        file: 03_create-exp-repo.qmd
       - text: "Launch an experiment"
-        file: launch.qmd
+        file: 04_launch.qmd
       - text: "Add Julia packages on HPC"
-        file: pkg.qmd
+        file: 05_pkg.qmd
       - text: "Prototypical pipeline"
-        file: example-pipeline.qmd
+        file: 06_example-pipeline.qmd
 
 format:
   html:

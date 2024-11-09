@@ -46,7 +46,7 @@ cd experiment_repo
 To run on a cluster, add the argument `-profile cluster` which 
 instructs nextflow to use the configs in section `cluster { ... }` 
 of the file `nextflow.config` created 
-[in the setup instructions](create-exp-repo.qmd#instructions).[^2] 
+[in the setup instructions](03_create-exp-repo.qmd#instructions).[^2] 
 
 [^2]: In the previous section ("local execution"), where we did not 
       specify a `-profile`, the default profile named `standard` is 

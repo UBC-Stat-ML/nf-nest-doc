@@ -6,9 +6,6 @@ pkg.html
 *.js
 *.woff
 
-/.quarto/
+/.quarto/*
 _site/*
-pkg_cache/*
-setup_cache/*
-create-exp-repo_cache/*
-launch_cache/*
+*_cache/*

@@ -85,6 +85,10 @@ cd experiment_repo
 ./nextflow run nf-nest/pkg.nf -profile cluster
 ```
 
+Optionally, you can append an argument to 
+specify the number of threads 
+to request and use during pre-compilation: e.g. add `--nPrecompileThreads 20` 
+to request 20 threads instead of the default of 10. 
 
 ## Testing your Julia environment interactively
 
