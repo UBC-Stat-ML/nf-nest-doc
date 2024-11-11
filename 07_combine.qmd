@@ -35,10 +35,10 @@ In that folder, we will
 put csv files.
 
 Then, once all Julia processes are done, another utilities 
-from `nf-nest`, `combine_csvs` will, merge all CSVs while 
+from `nf-nest`, `combine_csvs`, will merge all CSVs while 
 adding columns for the inputs (here, `seed` and `n_chains`).
 
-Finally, we will pass the merged CSVs to a plotting process
+Finally, we will pass the merged CSVs to a plotting process.
 
 
 ## Nextflow script
@@ -54,8 +54,46 @@ Finally, we will pass the merged CSVs to a plotting process
 ```{bash}
 cd experiment_repo
 ./nextflow run nf-nest/examples/full.nf -profile cluster 
-nf-nest/nf-open
 ```
 
 
 ## Accessing the output
+
+Each nextflow process is associated with a unique work directory to 
+ensure the processes do not interfere with each other. Here we cover two 
+ways to quickly access these work directories. 
+
+### Quick inspection
+
+A quick way to find the  output 
+of a nextflow process that we just ran is to use:
+
+```bash
+cd experiment_repo 
+nf-nest/nf-open
+```
+
+This lists the work folders for the last nextflow job. 
+
+
+### Organizing the output with a publishDir
+
+A better approach is to use the `publishDir` directive, 
+combined with `nf-nest`'s `deliverables()` utility, as 
+illustrated in the `run_julia` process above. 
+This will automatically copy the output of the process 
+associated with the directive in a sub-directory of 
+`experiment_repo/deliverables`. 
+
+```{bash}
+tree experiment_repo/deliverables
+```
+
+Here the `runName` can be used with nextflow's 
+[`log` command](https://www.nextflow.io/docs/latest/reports.html) 
+to obtain more information on the run.
+
+```{bash}
+cd experiment_repo
+./nextflow log
+```
