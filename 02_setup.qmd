@@ -9,6 +9,97 @@ You will need to go through these setup instructions before using nf-nest.
 This needs to be done only once per user and per cluster.  
 
 
+## Prerequisites
+
+- Working knowledge of unix (files, permissions, processes, environment variables). 
+- Working knowledge of git.
+
+There are countless web resources to learn those things. Tedious but worth the
+investment. 
+
+
+## Optional: Password-less SSH
+
+It is imperative for your sanity to avoid entering your password and 
+do 2FA every time a SSH connection is needed. 
+
+For example, on Sockeye, the closest you can get to that is with 
+[SSH Connection Sharing](https://confluence.it.ubc.ca/display/UARC/SSH+Connection+Sharing). 
+This means that you open a first terminal window and perform 2FA in it. 
+As long as that window is open, other SSH connections can be established 
+without password and 2FA. Minimize that first window and do not touch it.
+
+
+## Optional: Install VS Code 
+
+VS Code makes it easier to develop on a remote server. For example, 
+it simplifies file editing, resuming your session, manages github 
+credential for you, etc. 
+
+- On your laptop, install VSCode. 
+- Follow two steps documented in the [VS Code website](https://code.visualstudio.com/docs/remote/ssh-tutorial)
+    - [Install the SSH extension](https://code.visualstudio.com/docs/remote/ssh-tutorial#_install-the-extension)
+    - [Click on the Remote SSH icon in the lower left,](https://code.visualstudio.com/docs/remote/ssh-tutorial#_install-the-extension)
+      this will let you `Connect to Remote Host`. 
+
+Use `New Terminal` to open a terminal. Once you have a project (git repo)
+where you develop ready, use `Open Folder...` to point VS Code to 
+the root of your project. VS Code is also able to manage your github 
+authentification.
+
+
+## Understanding start up files
+
+Bash (and its cousins such as zsh) are used in two main ways:
+
+1. When you login via SSH.
+2. After being logged in, bash can be called by another process (e.g. bash, VS Code). 
+
+VS Code internally uses `1` once but hides it, and when a 
+new terminal in VS Code is opened, it is done via `2`. 
+
+When bash is started with `1`, the file `~/.bash_profile` is called. 
+When bash is started with `2`, the file `~/.bashrc` is **sometimes** called.[^1]
+
+[^1]: We emphasize "sometimes" here: for example, when nextflow calls bash, to make things 
+    reproducible, it does **not** automatically pass environment variables. They 
+    have to be set explicitly using [input environment variables](https://www.nextflow.io/docs/latest/process.html#input-environment-variables-env).
+    More generally, any parent process is free to decide which environment variables to 
+    propagate to its child. Bash uses `export` to make this decision automatically when 
+    it starts a child. Other languages such as nextflow make different decisions.
+
+Since we do `2` more frequently, we want it to be fast. It is OK if some operations 
+in `1` are a bit slow because it is less frequently called.
+
+Typically anything in `2` we want it to happen in `1` as well. So use this:
+
+```bash 
+# put that in .bash_profile so that anything in .bashrc also gets loaded
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+```
+
+Recall that any environment variables with `export` are passed in to child process. 
+So no need to set them every time in `2`, instead you can set them once and for all in `1` 
+(but then you need to login again for this take effect).
+
+On the other hand, aything with `alias`, `module`, etc, is not propagated. 
+
+
+## Git
+
+We assume the command `git` is available. 
+
+In some HPC such as UBC Sockeye, this command is not available by default, 
+instead a module has to be loaded:
+
+```{bash}
+module load git
+``` 
+
+
+
 ## Allocation code 
 
 In some HPC such as UBC Sockeye, we need an allocation code to 
@@ -22,13 +113,9 @@ To set the variable in your current session, use:
 export ALLOCATION_CODE=my-alloc-code
 ```
 
-To automatically set this variable for next time you login:
 
-```bash
-echo "export ALLOCATION_CODE=my-alloc-code" >> ~/.bashrc
-```
 
-## Optional: disable fancy nextflow fancy output
+## Optional: disable nextflow fancy output
 
 It can be useful to avoid nextflow's fancy progress output, 
 for example they do not work well in notebook or in 
@@ -40,35 +127,83 @@ To disable in the current session, use:
 export NXF_ANSI_LOG=false
 ```
 
-To automatically set this variable for next time you login:
 
+## Java
+
+Nextflow needs Java. Follow these instructions [taken from the nextflow website](https://www.nextflow.io/docs/latest/install.html):
+
+First, [Install SDKMAN](https://sdkman.io/install/)
 ```bash
-echo "export NXF_ANSI_LOG=false" >> ~/.bashrc
+curl -s https://get.sdkman.io | bash
 ```
 
-## TODO
+Second, open a new terminal, and install Java:
+```bash
+sdk install java 17.0.10-tem
+```
 
-- basic modules
+Finally, confirm that Java in installed correctly:
+```bash
+java -version
+```
 
-- Github setup
 
-- Java
+## Install Julia
 
-- Julia
+At the time of writing, Julia 1.11 is causing various issues, so 
+install Julia 1.10 using the 
+["Linux and FreeBSD" instructions](https://julialang.org/downloads/platform/#linux_and_freebsd) but 
+using the URL for the 
+[Long-term support version 1.10.6](https://julialang.org/downloads/#long_term_support_release).
 
-- symlinks
+You do not need root privileges, e.g., install in a folder at `~/bin/` and add to your path. 
 
-- j command
 
-- aliases
+## Julia depot
 
-- depot?
+Julia has a package manager called `Pkg`. 
+The Julia depot folder is a location where `Pkg` puts files it downloads and compiles.
+Each user should have their own. The path to the depot is controlled via 
+the [`JULIA_DEPOT_PATH` environment variable](https://docs.julialang.org/en/v1/manual/environment-variables/#JULIA_DEPOT_PATH).
 
-- allocation code 
+In a HPC setup, the `JULIA_DEPOT_PATH` should be accessible read/write by all nodes, and ideally be 
+on fast storage. 
 
-- scripts
-    - create-exp-repo
+For example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. path of the form
 
-- VS Code (resume, github credentials)
+```bash
+export JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/depot
+```
 
-- Docker
+A second choice would be to use the scratch space
+
+```bash
+export JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/depot
+```
+
+## Optional: useful aliases
+
+A very common patter in Julia is to activate the environment in the current directory and load
+[Revise.jl](https://timholy.github.io/Revise.jl/stable/). To do so, create a
+Julia script in your home directory called `julia-start.jl` and put that in it:
+
+```julia
+println("Active project: $(Base.active_project())")
+println("Loading Revise...")
+using Revise
+```
+
+Then add the following to `.bashrc`:
+
+```bash
+alias j='julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. ' 
+```
+
+Second, most HPC has some ways to start an interactive allocation. Create an alias 
+to be able to do it quicly. Here is an example for interactive CPU and GPU nodes 
+respectively on Sockeye:
+
+```bash
+alias interact='salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'
+alias ginteract='salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'
+```
