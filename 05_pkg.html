@@ -178,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_combine.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Job array reduction</span></a>
+ <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
     </ul>
@@ -277,16 +277,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/pkg.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/pkg.nf` [fervent_meucci] DSL2 - revision: 465ee97322
-[ed/f9f6f2] Submitted process &gt; instantiate_process
-[92/3c98fb] Submitted process &gt; precompile</code></pre>
+Launching `nf-nest/pkg.nf` [clever_aryabhata] DSL2 - revision: 869ec1e084
+[b0/0f347b] Submitted process &gt; instantiate_process
+[e6/442d42] Submitted process &gt; precompile</code></pre>
 </div>
 </div>
 <p>Optionally, you can append an argument to specify the number of threads to request and use during pre-compilation: e.g.&nbsp;add <code>--nPrecompileThreads 20</code> to request 20 threads instead of the default of 10.</p>
 </section>
 <section id="testing-your-julia-environment-interactively" class="level2">
 <h2 class="anchored" data-anchor-id="testing-your-julia-environment-interactively">Testing your Julia environment interactively</h2>
-<p>TODO: how to test the Julia env interactively</p>
+<p>In the code above, we have added the package <a href="https://github.com/Julia-Tempering/Pigeons.jl">Pigeons</a> as an example.</p>
+<p>To interactively test an installed package, simply activate the environment from a Julia session:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"experiment_repo/julia_env"</span>)</span>
@@ -391,7 +392,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/UBC-Stat-ML\.github\.io\/nf-nest-doc\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

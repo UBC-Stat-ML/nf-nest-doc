@@ -114,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./07_combine.html">Job array reduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./07_combine.html">Combine outputs</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -178,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_combine.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Job array reduction</span></a>
+ <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
     </ul>
@@ -192,6 +192,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
+  <li><a href="#strategy" id="toc-strategy" class="nav-link" data-scroll-target="#strategy">Strategy</a></li>
+  <li><a href="#nextflow-script" id="toc-nextflow-script" class="nav-link" data-scroll-target="#nextflow-script">Nextflow script</a></li>
+  <li><a href="#running-the-nextflow-script" id="toc-running-the-nextflow-script" class="nav-link" data-scroll-target="#running-the-nextflow-script">Running the nextflow script</a></li>
+  <li><a href="#accessing-the-output" id="toc-accessing-the-output" class="nav-link" data-scroll-target="#accessing-the-output">Accessing the output</a>
+  <ul class="collapse">
+  <li><a href="#quick-inspection" id="toc-quick-inspection" class="nav-link" data-scroll-target="#quick-inspection">Quick inspection</a></li>
+  <li><a href="#organizing-the-output-with-a-publishdir" id="toc-organizing-the-output-with-a-publishdir" class="nav-link" data-scroll-target="#organizing-the-output-with-a-publishdir">Organizing the output with a publishDir</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -219,110 +228,173 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>TODO</p>
+<p>Now that we know how to run many jobs, the next question is how to combine the output of all these jobs to analyze it.</p>
+</section>
+<section id="example" class="level2">
+<h2 class="anchored" data-anchor-id="example">Example</h2>
+<p>We will run <a href="https://github.com/Julia-Tempering/Pigeons.jl">Pigeons</a> on the cross product formed by calling <code>crossProduct(variables)</code> with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">:</span> <span class="fl">1..10</span><span class="op">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    n_chains<span class="op">:</span> <span class="op">[</span><span class="dv">10</span><span class="op">,</span> <span class="dv">20</span><span class="op">],</span> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Suppose we want to create a plot from the output of these 20 Julia processes.</p>
+</section>
+<section id="strategy" class="level2">
+<h2 class="anchored" data-anchor-id="strategy">Strategy</h2>
+<p>Each Julia process will create a folder. Using a function, we will provide an automatic name to this folder encoding the inputs used (<code>seed</code> and <code>n_chains</code>). That name is provided by <code>nf-nest</code>’s <code>filed()</code> function. In that folder, we will<br>
+put csv files.</p>
+<p>Then, once all Julia processes are done, another utilities from <code>nf-nest</code>, <code>combine_csvs</code>, will merge all CSVs while adding columns for the inputs (here, <code>seed</code> and <code>n_chains</code>).</p>
+<p>Finally, we will pass the merged CSVs to a plotting process.</p>
+</section>
+<section id="nextflow-script" class="level2">
+<h2 class="anchored" data-anchor-id="nextflow-script">Nextflow script</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// includes are relative to the .nf file, should always start with ./ or ../</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> crossProduct<span class="op">;</span> filed<span class="op">;</span> deliverables <span class="op">}</span> from <span class="st">'../cross.nf'</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> instantiate<span class="op">;</span> precompile<span class="op">;</span> activate <span class="op">}</span> from <span class="st">'../pkg.nf'</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> combine_csvs<span class="op">;</span> <span class="op">}</span> from <span class="st">'../combine.nf'</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">// in contrast, file(..) is relative to `pwd`, use projectDir/ </span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">//   to make it relative to main .nf file, or moduleDir for the .nf file</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> julia_env <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>moduleDir<span class="op">/</span><span class="st">'julia_env'</span><span class="op">)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> plot_script <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>moduleDir<span class="op">/</span><span class="st">'plot.jl'</span><span class="op">)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">:</span> <span class="fl">1..10</span><span class="op">,</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    n_chains<span class="op">:</span> <span class="op">[</span><span class="dv">10</span><span class="op">,</span> <span class="dv">20</span><span class="op">],</span> </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    compiled_env <span class="op">=</span> <span class="fu">instantiate</span><span class="op">(</span>julia_env<span class="op">)</span> <span class="op">|</span> precompile</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    configs <span class="op">=</span> <span class="fu">crossProduct</span><span class="op">(</span>variables<span class="op">)</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    combined <span class="op">=</span> <span class="fu">run_julia</span><span class="op">(</span>compiled_env<span class="op">,</span> configs<span class="op">)</span> <span class="op">|</span> combine_csvs</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span><span class="op">(</span>compiled_env<span class="op">,</span> plot_script<span class="op">,</span> combined<span class="op">)</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        path julia_env </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        val config </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        path <span class="st">"</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">"</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="st">    # run your code</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="st">    using Pigeons </span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">    using CSV </span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">    pt = pigeons(</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">            target = toy_mvn_target(1000), </span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">            n_chains = </span><span class="ss">${</span>config<span class="op">.</span>n_chains<span class="ss">}</span><span class="st">, </span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="st">            seed = </span><span class="ss">${</span>config<span class="op">.</span>seed<span class="ss">}</span><span class="st">)</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="st">    # organize output as follows:</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="st">    #   - create a directory with name controlled by filed(config)</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="st">    #     to keep track of input configuration</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="st">    #   - put any number of CSV in there</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="st">    mkdir("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">")</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="st">    CSV.write("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">/summary.csv", pt.shared.reports.summary)</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="st">    CSV.write("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">/swap_prs.csv", pt.shared.reports.swap_prs)</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>process plot <span class="op">{</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        path julia_env </span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        path plot_script</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        path combined_csvs_folder </span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        path <span class="st">'*.png'</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        path combined_csvs_folder</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    publishDir <span class="st">"</span><span class="ss">${</span><span class="fu">deliverables</span><span class="op">(</span>workflow<span class="op">,</span> params<span class="op">)</span><span class="ss">}</span><span class="st">"</span><span class="op">,</span> mode<span class="op">:</span> <span class="st">'copy'</span><span class="op">,</span> overwrite<span class="op">:</span> <span class="kw">true</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="st">    include("</span><span class="ss">$plot_script</span><span class="st">")</span></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="st">    create_plots("</span><span class="ss">$combined_csvs_folder</span><span class="st">")</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// includes are relative to the .nf file, should always start with ./ or ../</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> crossProduct<span class="op">;</span> filed<span class="op">;</span> deliverables <span class="op">}</span> from <span class="st">'../cross.nf'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> instantiate<span class="op">;</span> precompile<span class="op">;</span> activate <span class="op">}</span> from <span class="st">'../pkg.nf'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> combine_csvs<span class="op">;</span> <span class="op">}</span> from <span class="st">'../combine.nf'</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">// in contrast, file(..) is relative to `pwd`, use projectDir/ </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">//   to make it relative to main .nf file, or moduleDir for the .nf file</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> julia_env <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>moduleDir<span class="op">/</span><span class="st">'julia_env'</span><span class="op">)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> plot_script <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>moduleDir<span class="op">/</span><span class="st">'plot.jl'</span><span class="op">)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">:</span> <span class="fl">1..10</span><span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    n_chains<span class="op">:</span> <span class="op">[</span><span class="dv">10</span><span class="op">,</span> <span class="dv">20</span><span class="op">],</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    compiled_env <span class="op">=</span> <span class="fu">instantiate</span><span class="op">(</span>julia_env<span class="op">)</span> <span class="op">|</span> precompile</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    configs <span class="op">=</span> <span class="fu">crossProduct</span><span class="op">(</span>variables<span class="op">)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    combined <span class="op">=</span> <span class="fu">run_julia</span><span class="op">(</span>compiled_env<span class="op">,</span> configs<span class="op">)</span> <span class="op">|</span> combine_csvs</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span><span class="op">(</span>compiled_env<span class="op">,</span> plot_script<span class="op">,</span> combined<span class="op">)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        path julia_env </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        val config </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        path <span class="st">"</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">"</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="st">    # run your code</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="st">    using Pigeons </span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="st">    using CSV </span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="st">    pt = pigeons(</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="st">            target = toy_mvn_target(1000), </span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="st">            n_chains = </span><span class="ss">${</span>config<span class="op">.</span>n_chains<span class="ss">}</span><span class="st">, </span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="st">            seed = </span><span class="ss">${</span>config<span class="op">.</span>seed<span class="ss">}</span><span class="st">)</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="st">    # organize output as follows:</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="st">    #   - create a directory with name controlled by filed(config)</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="st">    #     to keep track of input configuration</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="st">    #   - put any number of CSV in there</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="st">    mkdir("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">")</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="st">    CSV.write("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">/summary.csv", pt.shared.reports.summary)</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="st">    CSV.write("</span><span class="ss">${</span><span class="fu">filed</span><span class="op">(</span>config<span class="op">)</span><span class="ss">}</span><span class="st">/swap_prs.csv", pt.shared.reports.swap_prs)</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>process plot <span class="op">{</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        path julia_env </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        path plot_script</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        path combined_csvs_folder </span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        path <span class="st">'*.png'</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        path combined_csvs_folder</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    publishDir <span class="st">"</span><span class="ss">${</span><span class="fu">deliverables</span><span class="op">(</span>workflow<span class="op">,</span> params<span class="op">)</span><span class="ss">}</span><span class="st">"</span><span class="op">,</span> mode<span class="op">:</span> <span class="st">'copy'</span><span class="op">,</span> overwrite<span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="st">    include("</span><span class="ss">$plot_script</span><span class="st">")</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="st">    create_plots("</span><span class="ss">$combined_csvs_folder</span><span class="st">")</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="running-the-nextflow-script" class="level2">
+<h2 class="anchored" data-anchor-id="running-the-nextflow-script">Running the nextflow script</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/full.nf` [shrivelled_euler] DSL2 - revision: a68c131baa
-[7a/50587f] Cached process &gt; instantiate_process
-[1c/02d610] Cached process &gt; combine_workflow:instantiate_process
-[9b/54d7ac] Cached process &gt; combine_workflow:precompile
-[13/2f2fa7] Cached process &gt; precompile
-[a0/dccea5] Cached process &gt; run_julia (9)
-[1f/6a3eeb] Cached process &gt; run_julia (2)
-[d1/abb205] Cached process &gt; run_julia (7)
-[f7/11f760] Cached process &gt; run_julia (3)
-[2c/4c4931] Cached process &gt; run_julia (1)
-[01/6aaa76] Cached process &gt; run_julia (8)
-[1d/a0be22] Cached process &gt; run_julia (6)
-[52/089f70] Cached process &gt; run_julia (4)
-[e9/afa958] Cached process &gt; run_julia (10)
-[c0/a5a41c] Cached process &gt; run_julia (11)
-[f9/c8f35a] Cached process &gt; run_julia (5)
-[61/f63d59] Cached process &gt; run_julia (13)
-[0f/acbc2a] Cached process &gt; run_julia (14)
-[99/a49194] Cached process &gt; run_julia (15)
-[fe/ad3bab] Cached process &gt; run_julia (18)
-[b2/9183c7] Cached process &gt; run_julia (12)
-[5c/033f75] Cached process &gt; run_julia (16)
-[26/8c6f62] Cached process &gt; run_julia (17)
-[ff/f5e7ff] Cached process &gt; run_julia (19)
-[6b/074f8e] Cached process &gt; run_julia (20)
-[77/fb3798] Cached process &gt; combine_workflow:combine_process
-[b2/af3645] Cached process &gt; plot</code></pre>
+Launching `nf-nest/examples/full.nf` [distraught_mercator] DSL2 - revision: a68c131baa
+[83/3aeed4] Cached process &gt; combine_workflow:instantiate_process
+[e3/1f4424] Cached process &gt; instantiate_process
+[c0/0ec986] Cached process &gt; precompile
+[98/386e37] Cached process &gt; combine_workflow:precompile
+[10/2bbd71] Cached process &gt; run_julia (5)
+[e6/0b1ec1] Cached process &gt; run_julia (11)
+[33/4ad6aa] Cached process &gt; run_julia (7)
+[d5/6a60e0] Cached process &gt; run_julia (4)
+[2d/99c01f] Cached process &gt; run_julia (12)
+[2f/397824] Cached process &gt; run_julia (15)
+[d7/a4d24c] Cached process &gt; run_julia (1)
+[4c/ae1bf0] Cached process &gt; run_julia (3)
+[f6/e22d72] Cached process &gt; run_julia (8)
+[4f/1aad96] Cached process &gt; run_julia (9)
+[b5/c464a8] Cached process &gt; run_julia (14)
+[34/8b2f37] Cached process &gt; run_julia (13)
+[37/f3e661] Cached process &gt; run_julia (16)
+[91/3d28f2] Cached process &gt; run_julia (17)
+[9e/8e7aac] Cached process &gt; run_julia (2)
+[c7/e3e10e] Cached process &gt; run_julia (19)
+[a8/aaa2ad] Cached process &gt; run_julia (6)
+[6c/a9a22e] Cached process &gt; run_julia (18)
+[ee/e2c832] Cached process &gt; run_julia (20)
+[d0/b1d8a8] Cached process &gt; run_julia (10)
+[fd/4bd721] Cached process &gt; combine_workflow:combine_process
+[02/c1b3d0] Submitted process &gt; plot</code></pre>
+</div>
+</div>
+</section>
+<section id="accessing-the-output" class="level2">
+<h2 class="anchored" data-anchor-id="accessing-the-output">Accessing the output</h2>
+<p>Each nextflow process is associated with a unique work directory to ensure the processes do not interfere with each other. Here we cover two ways to quickly access these work directories.</p>
+<section id="quick-inspection" class="level3">
+<h3 class="anchored" data-anchor-id="quick-inspection">Quick inspection</h3>
+<p>A quick way to find the output of a nextflow process that we just ran is to use:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">nf-nest/nf-open</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This lists the work folders for the last nextflow job.</p>
+</section>
+<section id="organizing-the-output-with-a-publishdir" class="level3">
+<h3 class="anchored" data-anchor-id="organizing-the-output-with-a-publishdir">Organizing the output with a publishDir</h3>
+<p>A better approach is to use the <code>publishDir</code> directive, combined with <code>nf-nest</code>’s <code>deliverables()</code> utility, as illustrated in the <code>run_julia</code> process above. This will automatically copy the output of the process associated with the directive in a sub-directory of <code>experiment_repo/deliverables</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>experiment_repo/deliverables
+└── scriptName=full.nf___runName=distraught_mercator
+    ├── output
+    │&nbsp;&nbsp; ├── summary.csv
+    │&nbsp;&nbsp; └── swap_prs.csv
+    └── plot.png
+
+2 directories, 3 files</code></pre>
+</div>
+</div>
+<p>Here the <code>runName</code> can be used with nextflow’s <a href="https://www.nextflow.io/docs/latest/reports.html"><code>log</code> command</a> to obtain more information on the run.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                
+2024-11-10 21:25:52 1.3s        sharp_gautier       OK      9d1a692a7e  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/hello.nf                 
+2024-11-10 21:25:56 6.5s        angry_gautier       OK      9d1a692a7e  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/hello.nf -profile cluster
+2024-11-10 21:26:53 1m 12s      clever_aryabhata    OK      869ec1e084  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/pkg.nf -profile cluster           
+2024-11-10 21:40:58 3m 28s      nostalgic_celsius   ERR     a68c131baa  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/full.nf -profile cluster 
+2024-11-10 21:44:42 42.5s       distraught_mercator OK      a68c131baa  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -418,7 +490,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/UBC-Stat-ML\.github\.io\/nf-nest-doc\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

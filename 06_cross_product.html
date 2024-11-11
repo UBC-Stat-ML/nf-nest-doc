@@ -101,6 +101,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -178,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_combine.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Job array reduction</span></a>
+ <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
     </ul>
@@ -192,6 +221,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
+  <li><a href="#nextflow-script" id="toc-nextflow-script" class="nav-link" data-scroll-target="#nextflow-script">Nextflow script</a></li>
+  <li><a href="#running-the-script" id="toc-running-the-script" class="nav-link" data-scroll-target="#running-the-script">Running the script</a></li>
   </ul>
 </nav>
     </div>
@@ -219,86 +251,117 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>TODO</p>
+<p>Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.</p>
+<p>This page shows a streamlined way to do so.</p>
+</section>
+<section id="example" class="level2">
+<h2 class="anchored" data-anchor-id="example">Example</h2>
+<p>As a toy example, suppose we want to compute all additions of the form <code>a + b</code> where <code>a</code> and <code>b</code> are integers from 1 to 3. In addition, we also want <code>a * b</code>. This means we will need <span class="math inline">\(3 \times 3 \times 2\)</span> calculations.</p>
+<p>We can characterize the inputs a the cross-product denoted <span class="math inline">\(\{1, 2, 3\} \times \{1, 2, 3\} \times \{+, *\}\)</span>.</p>
+</section>
+<section id="nextflow-script" class="level2">
+<h2 class="anchored" data-anchor-id="nextflow-script">Nextflow script</h2>
+<p>The script below will perform the following operations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// includes are relative to the .nf file, should always start with ./ or ../</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> crossProduct<span class="op">;</span> filed<span class="op">;</span> deliverables <span class="op">}</span> from <span class="st">'../cross.nf'</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> instantiate<span class="op">;</span> precompile<span class="op">;</span> activate <span class="op">}</span> from <span class="st">'../pkg.nf'</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> julia_env <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>projectDir<span class="op">/</span><span class="st">'julia_env'</span><span class="op">)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    first<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    second<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    operation<span class="op">:</span> <span class="op">[</span><span class="st">"+"</span><span class="op">,</span> <span class="st">"*"</span><span class="op">]</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// we use utilities in the nf-nest submodule</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">// in user scripts, path would be './nf-nest/cross.nf' </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> crossProduct<span class="op">;</span> filed<span class="op">;</span> deliverables <span class="op">}</span> from <span class="st">'../cross.nf'</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> instantiate<span class="op">;</span> precompile<span class="op">;</span> activate <span class="op">}</span> from <span class="st">'../pkg.nf'</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    first<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    second<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    operation<span class="op">:</span> <span class="op">[</span><span class="st">"+"</span><span class="op">,</span> <span class="st">"*"</span><span class="op">]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">// specifies the order of operations</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// prepare Julia env</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    compiled_env <span class="op">=</span> <span class="fu">instantiate</span><span class="op">(</span>julia_env<span class="op">)</span> <span class="op">|</span> precompile</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// look at all combinations of variables</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    configs <span class="op">=</span> <span class="fu">crossProduct</span><span class="op">(</span>variables<span class="op">)</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// run Julia on 18 nodes!</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">run_julia</span><span class="op">(</span>compiled_env<span class="op">,</span> configs<span class="op">)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    debug <span class="kw">true</span> <span class="co">// by default, standard out is not shown, use this to show it</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    time <span class="fl">1.</span>min</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    cpus <span class="dv">1</span> </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    memory <span class="fl">1.</span>GB</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        path julia_env </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        val config </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="st">    @show </span><span class="ss">${</span>config<span class="op">.</span>first<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>operation<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>second<span class="ss">}</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// look at all combinations of variables</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    configs <span class="op">=</span> <span class="fu">crossProduct</span><span class="op">(</span>variables<span class="op">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// run Julia on 18 nodes!</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">run_julia</span><span class="op">(</span>configs<span class="op">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// equivalent syntax:</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">// crossProduct(variables) | run_julia</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    debug <span class="kw">true</span> <span class="co">// by default, standard out is not shown, use this to show it</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// information used when submitting job to queue</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    time <span class="fl">2.</span>min</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    cpus <span class="dv">1</span> </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    memory <span class="fl">5.</span>GB</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        val config </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">()</span><span class="ss">}</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">    # ^ this is just a shortcut for:</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">    #!/usr/bin/env julia --threads=1</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="st">    @show </span><span class="ss">${</span>config<span class="op">.</span>first<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>operation<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>second<span class="ss">}</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>For more information:</p>
+<ul>
+<li><a href="https://www.nextflow.io/docs/latest/script.html">Read on the nextflow scripting language</a></li>
+<li><a href="https://www.nextflow.io/docs/latest/process.html">Read on nextflow’s <code>process</code> block</a></li>
+<li><code>configs</code> in the above is an example of a <a href="https://www.nextflow.io/docs/latest/channel.html">nextflow <code>Channel</code></a></li>
+<li><a href="https://www.nextflow.io/docs/latest/workflow.html">More on nextflow’s <code>workflow</code> block</a></li>
+</ul>
+</section>
+<section id="running-the-script" class="level2">
+<h2 class="anchored" data-anchor-id="running-the-script">Running the script</h2>
+<p>Running it with the <code>-profile cluster</code> option will:</p>
+<ul>
+<li>build a cross-product from <code>variables</code></li>
+<li>for each one, automatically create submission scripts</li>
+<li>run these Julia processes and show the standard out.</li>
+</ul>
+<p>From the command line, running the script is done as follows:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/many_jobs.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/many_jobs.nf` [compassionate_cajal] DSL2 - revision: 98439f37e4
-[7a/50587f] Cached process &gt; instantiate_process
-[13/2f2fa7] Cached process &gt; precompile
-[91/826866] Submitted process &gt; run_julia (8)
-[59/cc8e13] Submitted process &gt; run_julia (3)
-[56/4b1e5a] Submitted process &gt; run_julia (9)
-[54/17463f] Submitted process &gt; run_julia (13)
-[e0/4b001e] Submitted process &gt; run_julia (16)
-[b5/da9f3b] Submitted process &gt; run_julia (2)
-[ff/306210] Submitted process &gt; run_julia (12)
-[b7/b226cf] Submitted process &gt; run_julia (1)
-[62/a220fc] Submitted process &gt; run_julia (5)
-[2a/52b317] Submitted process &gt; run_julia (4)
-[63/5cb5f1] Submitted process &gt; run_julia (6)
-[cf/fbb5b4] Submitted process &gt; run_julia (7)
-[ad/6d05d2] Submitted process &gt; run_julia (10)
-[95/3084a5] Submitted process &gt; run_julia (14)
-[ee/05d1f8] Submitted process &gt; run_julia (11)
-[55/5ba40d] Submitted process &gt; run_julia (15)
-[4a/ee4ac1] Submitted process &gt; run_julia (17)
-[14/eb14c1] Submitted process &gt; run_julia (18)
-2 * 1 = 2
-1 + 2 = 3
-2 + 2 = 4
-3 + 1 = 4
-3 * 2 = 6
-1 * 1 = 1
-2 * 3 = 6
-1 + 1 = 2
-1 + 3 = 4
-1 * 2 = 2
-1 * 3 = 3
-2 + 1 = 3
-2 * 2 = 4
+WARN: It appears you have never run this project before -- Option `-resume` is ignored
+Launching `nf-nest/examples/many_jobs.nf` [marvelous_shockley] DSL2 - revision: aa082b1978
+[cb/6e887f] Submitted process &gt; run_julia (11)
+[a6/bdf5ad] Submitted process &gt; run_julia (14)
+[47/0b890b] Submitted process &gt; run_julia (7)
+[b6/c30b43] Submitted process &gt; run_julia (15)
+[47/d19288] Submitted process &gt; run_julia (10)
+[a4/d0eb7e] Submitted process &gt; run_julia (5)
+[8c/a6e0e1] Submitted process &gt; run_julia (2)
+[39/758dad] Submitted process &gt; run_julia (8)
+[be/865d39] Submitted process &gt; run_julia (6)
+[cc/33ee89] Submitted process &gt; run_julia (4)
+[8a/538ece] Submitted process &gt; run_julia (1)
+[c6/d831eb] Submitted process &gt; run_julia (3)
+[47/0601e5] Submitted process &gt; run_julia (13)
+[bc/17cd3c] Submitted process &gt; run_julia (9)
+[28/892f35] Submitted process &gt; run_julia (16)
+[e8/91516e] Submitted process &gt; run_julia (12)
+[58/af841a] Submitted process &gt; run_julia (17)
+[35/c3804f] Submitted process &gt; run_julia (18)
 3 * 1 = 3
-2 + 3 = 5
 3 + 2 = 5
+2 + 1 = 3
+2 + 3 = 5
+2 * 2 = 4
+1 + 3 = 4
+1 * 1 = 1
+2 * 1 = 2
+1 * 3 = 3
+1 * 2 = 2
+1 + 1 = 2
+1 + 2 = 3
+3 + 1 = 4
+2 + 2 = 4
+3 * 2 = 6
+2 * 3 = 6
 3 + 3 = 6
 3 * 3 = 9</code></pre>
 </div>
@@ -400,7 +463,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/UBC-Stat-ML\.github\.io\/nf-nest-doc\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

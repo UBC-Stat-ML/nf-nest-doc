@@ -173,7 +173,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_combine.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Job array reduction</span></a>
+ <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
     </ul>
@@ -350,7 +350,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/UBC-Stat-ML\.github\.io\/nf-nest-doc\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
