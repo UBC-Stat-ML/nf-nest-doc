@@ -29,6 +29,8 @@ format:
     css: styles.css
     toc: true
     linkcolor: black
+    mermaid:
+      theme: neutral
 
 editor: source
 

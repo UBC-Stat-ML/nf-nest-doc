@@ -6,12 +6,24 @@ engine: knitr
 ## Context
 
 Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. 
+Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. 
+It is crucial to have good tools to coordinate and organize these experiments. 
 
 
-## Goal
+## `nf-nest`
 
-This repository documents `nf-nest` a suite of utilities to help you succeed in your 
-numerical experimental campaigns. 
+This webpage documents `nf-nest`, a collection of small but powerful utilities built on nextflow to
+help accomplish this.
+
+Aspects taken into account:
+
+- Automating cross-product of input parameters in experiments. 
+- Automating creation of submission scripts and ordering of jobs (taking care of moving across file system, dynamic memory requirements, etc). 
+- Automating the gathering of results from many runs. 
+- Caching already ran jobs. 
+- Robustness to failure. 
+- Reproducibility via apptainer and docker, supporting both x86 and apple silicon. 
+- Support for GPU programming. 
 
 
 ## Technology stack
@@ -32,16 +44,53 @@ A scientific workflow is a directed acyclic graph where each node is a process a
 between node $n$ to $n'$
 denote that at least one output of process $n$ is fed as an input to process $n'$. 
 
-TODO: prototype example (preprocess / precompile / run array of exeriments / combine / plot) / figure
+Here is an example from [a workflow covered later in this tutorial](07_combine.qmd):
 
-TODO: mention benefits - job submission of each node at right time, file system issues, retries, repro, etc 
+```{mermaid}
+flowchart TB
+    subgraph " "
+    v0["julia_env"]
+    v1["toml"]
+    v4["Channel.fromList"]
+    v7["julia_env"]
+    v8["toml"]
+    v12["plot_script"]
+    end
+    v2([instantiate_process])
+    v3([precompile])
+    v5([run_julia])
+    subgraph combine_workflow
+    v9([instantiate_process])
+    v10([precompile])
+    v11([combine_process])
+    end
+    v13([plot])
+    subgraph " "
+    v14["combined_csvs_folder"]
+    v15[" "]
+    end
+    v6(( ))
+    v0 --> v2
+    v1 --> v2
+    v2 --> v3
+    v3 --> v5
+    v3 --> v13
+    v4 --> v5
+    v5 --> v6
+    v7 --> v9
+    v8 --> v9
+    v9 --> v10
+    v10 --> v11
+    v6 --> v11
+    v11 --> v13
+    v12 --> v13
+    v13 --> v15
+    v13 --> v14
+```
 
+## More information
 
-### Nextflow
+Both nextflow and Julia have excellent and extensive documentation. 
 
-TODO: pointer to doc, etc. 
-
-
-### Julia 
-
-TODO: pointer to doc
+- [Nexflow documentation](https://www.nextflow.io/docs/latest/overview.html)
+- [Julia documentation](https://docs.julialang.org/en/v1/)
