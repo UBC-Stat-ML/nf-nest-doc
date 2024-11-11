@@ -120,11 +120,11 @@
     ]
   },
   {
-    "objectID": "04_launch.html#keeping-long-cluster-executions-alive",
-    "href": "04_launch.html#keeping-long-cluster-executions-alive",
+    "objectID": "04_launch.html#managing-long-executions",
+    "href": "04_launch.html#managing-long-executions",
     "title": "Launching an experiment",
-    "section": "Keeping long cluster executions alive",
-    "text": "Keeping long cluster executions alive\nTODO: screen and tmux",
+    "section": "Managing long executions",
+    "text": "Managing long executions\nWhen starting a job, the launching nextflow process needs to stay alive until the end of the last job. However, when the SSH connection is lost (e.g., you close your laptop), the nextflow process and hence child jobs will be killed. To avoid this, use screen or tmux which allows you to preserve a SSH session even if the SSH connection is closed.\n\nBasic instructions to start a long job\n\nTake note of which of the login nodes you are starting the job (e.g. in Sockeye, login01, login02 or login03).\nList existing tmux sessions with tmux ls\nCreate one with tmux or join last one with tmux a\nStart the nextflow.\nTo detach the tmux session ctrl-b followed by d\n\n\n\nLook at the status after being disconnected\n\nSSH in.\nIf you are in the wrong login node, use e.g., ssh login02 (follow 2FA instruction)\nReattach with tmux a\n\nFor more information on tmux, use this cheat sheet.\n\n\nCancelling a nextflow workflow\nPress ctrl-c only once. This will instruct nextflow to clean up children jobs: killing running jobs, as well as cancelling queued jobs.",
     "crumbs": [
       "Launch an experiment"
     ]
@@ -264,7 +264,7 @@
     "href": "02_setup.html#optional-useful-aliases",
     "title": "Setting up your HPC account",
     "section": "Optional: useful aliases",
-    "text": "Optional: useful aliases\nA very common patter in Julia is to activate the environment in the current directory and load Revise.jl. To do so, create a Julia script in your home directory called julia-start.jl and put that in it:\nprintln(\"Active project: $(Base.active_project())\")\nprintln(\"Loading Revise...\")\nusing Revise\nThen add the following to .bashrc:\nalias j='julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. ' \nSecond, most HPC has some ways to start an interactive allocation. Create an alias to be able to do it quicly. Here is an example for interactive CPU and GPU nodes respectively on Sockeye:\nalias interact='salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'\nalias ginteract='salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'",
+    "text": "Optional: useful aliases\nBash supports shortcuts called alias for commonly used commands. We show two use cases here.\nA very common patter in Julia is to activate the environment in the current directory and load Revise.jl. To do so, create a Julia script in your home directory called julia-start.jl and put that in it:\nprintln(\"Active project: $(Base.active_project())\")\nprintln(\"Loading Revise...\")\nusing Revise\nThen add the following to .bashrc:\nalias j='julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. ' \nYou will need to install Revise.jl in the global environment:\njulia\n]\nactivate\nadd Revise \nSecond, most HPC has some ways to start an interactive allocation. Create an alias to be able to do it quicly. Here is an example for interactive CPU and GPU nodes respectively on Sockeye:\nalias interact='salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'\nalias ginteract='salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'",
     "crumbs": [
       "Setup your HPC account"
     ]
@@ -424,7 +424,7 @@
     "href": "05_pkg.html",
     "title": "Managing Julia packages on HPC",
     "section": "",
-    "text": "TODO: something about how if you are on your laptop follow simpler instructions\nTODO: background on pkg, HPC limitations",
+    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
     "crumbs": [
       "Add Julia packages on HPC"
     ]
@@ -434,7 +434,7 @@
     "href": "05_pkg.html#overview",
     "title": "Managing Julia packages on HPC",
     "section": "",
-    "text": "TODO: something about how if you are on your laptop follow simpler instructions\nTODO: background on pkg, HPC limitations",
+    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
     "crumbs": [
       "Add Julia packages on HPC"
     ]
@@ -454,7 +454,7 @@
     "href": "05_pkg.html#adding-a-package",
     "title": "Managing Julia packages on HPC",
     "section": "Adding a package",
-    "text": "Adding a package\nThen there are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.\nIn both syntaxes, we first need to tell Julia which environment to use. This is called “activating” an environment.\n\nInteractive Julia package manager\nThe most common method is to use the interactive Julia package manager. To start it, type ] followed by enter.\nActivating is done with the activate keyword.\nYou can then add a package using the add command. The argument of add can be either a registered Julia package, as in:\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\n]\nactivate experiment_repo/julia_env\nadd Pigeons\nor it can be a git repository, optionally with a specific commit/tag:\nadd Example@0.5\nadd Example#master\nadd Example#c37b675\nadd https://github.com/JuliaLang/Example.jl#master\nadd git@github.com:JuliaLang/Example.jl.git\nadd \"git@github.com:JuliaLang/Example.jl.git\"#master\nadd https://github.com/Company/MonoRepo:juliapkgs/Package.jl\nTo exit the interactive Julia package manager, type control-C.\n\n\nProgrammatic interface\nAlternatively, a programmatic interface is also available for scripting:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"Pigeons\")",
+    "text": "Adding a package\nThere are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.\nIn both syntaxes, we first need to tell Julia which environment to use. This is called “activating” an environment.\n\nInteractive Julia package manager\nThe most common method is to use the interactive Julia package manager. To start it, type ] followed by enter.\nActivating is done with the activate keyword.\nYou can then add a package using the add command. The argument of add can be either a registered Julia package, for example we show here how to add the Pigeons package for MCMC sampling:\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\n]\nactivate experiment_repo/julia_env\nadd Pigeons\nAlternatively, the package can be a git repository, optionally with a specific commit/tag:\nadd Example@0.5\nadd Example#master\nadd Example#c37b675\nadd https://github.com/JuliaLang/Example.jl#master\nadd git@github.com:JuliaLang/Example.jl.git\nadd \"git@github.com:JuliaLang/Example.jl.git\"#master\nadd https://github.com/Company/MonoRepo:juliapkgs/Package.jl\nTo exit the interactive Julia package manager, type control-C.\n\n\nProgrammatic interface\nAlternatively, a programmatic interface is also available for scripting:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"Pigeons\")",
     "crumbs": [
       "Add Julia packages on HPC"
     ]
@@ -475,6 +475,16 @@
     "title": "Managing Julia packages on HPC",
     "section": "Testing your Julia environment interactively",
     "text": "Testing your Julia environment interactively\nIn the code above, we have added the package Pigeons as an example.\nTo interactively test an installed package, simply activate the environment from a Julia session:\n\nusing Pkg\nPkg.activate(\"experiment_repo/julia_env\")\n\nusing Pigeons\npigeons(target = toy_mvn_target(1000))",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#more-information",
+    "href": "05_pkg.html#more-information",
+    "title": "Managing Julia packages on HPC",
+    "section": "More information",
+    "text": "More information\nSee Pkg.jl documentation.",
     "crumbs": [
       "Add Julia packages on HPC"
     ]

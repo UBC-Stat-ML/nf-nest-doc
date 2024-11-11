@@ -326,15 +326,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="optional-useful-aliases" class="level2">
 <h2 class="anchored" data-anchor-id="optional-useful-aliases">Optional: useful aliases</h2>
+<p>Bash supports shortcuts called alias for commonly used commands. We show two use cases here.</p>
 <p>A very common patter in Julia is to activate the environment in the current directory and load <a href="https://timholy.github.io/Revise.jl/stable/">Revise.jl</a>. To do so, create a Julia script in your home directory called <code>julia-start.jl</code> and put that in it:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Active project: </span><span class="sc">$</span>(<span class="bu">Base</span>.<span class="fu">active_project</span>())<span class="st">"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Loading Revise..."</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Revise</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Then add the following to <code>.bashrc</code>:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> j=<span class="st">'julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. '</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You will need to install Revise.jl in the global environment:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">julia</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">activate</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">add</span> Revise </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Second, most HPC has some ways to start an interactive allocation. Create an alias to be able to do it quicly. Here is an example for interactive CPU and GPU nodes respectively on Sockeye:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> interact=<span class="st">'salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> ginteract=<span class="st">'salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> interact=<span class="st">'salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> ginteract=<span class="st">'salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

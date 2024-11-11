@@ -200,6 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#precompilation-on-hpc" id="toc-precompilation-on-hpc" class="nav-link" data-scroll-target="#precompilation-on-hpc">Precompilation on HPC</a></li>
   <li><a href="#testing-your-julia-environment-interactively" id="toc-testing-your-julia-environment-interactively" class="nav-link" data-scroll-target="#testing-your-julia-environment-interactively">Testing your Julia environment interactively</a></li>
+  <li><a href="#more-information" id="toc-more-information" class="nav-link" data-scroll-target="#more-information">More information</a></li>
   </ul>
 </nav>
     </div>
@@ -227,8 +228,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>TODO: something about how if you are on your laptop follow simpler instructions</p>
-<p>TODO: background on pkg, HPC limitations</p>
+<p>Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>activate experiment_repo<span class="op">/</span>julia_env</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>add NameOfPackage</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.</p>
 </section>
 <section id="julia-environment" class="level2">
 <h2 class="anchored" data-anchor-id="julia-environment">Julia environment</h2>
@@ -237,35 +241,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="adding-a-package" class="level2">
 <h2 class="anchored" data-anchor-id="adding-a-package">Adding a package</h2>
-<p>Then there are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.</p>
+<p>There are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.</p>
 <p>In both syntaxes, we first need to tell Julia which environment to use. This is called “activating” an environment.</p>
 <section id="interactive-julia-package-manager" class="level3">
 <h3 class="anchored" data-anchor-id="interactive-julia-package-manager">Interactive Julia package manager</h3>
 <p>The most common method is to use the interactive Julia package manager. To start it, type <code>]</code> followed by <code>enter</code>.</p>
 <p>Activating is done with the <code>activate</code> keyword.</p>
-<p>You can then add a package using the <code>add</code> command. The argument of <code>add</code> can be either a registered Julia package, as in:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cn">ENV</span>[<span class="st">"JULIA_PKG_PRECOMPILE_AUTO"</span>]<span class="op">=</span><span class="fl">0</span> <span class="co"># Hold off precompile since we are in login node</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>activate experiment_repo<span class="op">/</span>julia_env</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>add Pigeons</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>or it can be a git repository, optionally with a specific commit/tag:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>add Example@<span class="fl">0.5</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>add Example<span class="co">#master</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>add Example<span class="co">#c37b675</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>add https<span class="op">://</span>github.com<span class="op">/</span>JuliaLang<span class="op">/</span>Example.jl<span class="co">#master</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>add git<span class="pp">@github</span>.com<span class="op">:</span>JuliaLang<span class="op">/</span>Example.jl.git</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>add <span class="st">"git@github.com:JuliaLang/Example.jl.git"</span><span class="co">#master</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>add https<span class="op">://</span>github.com<span class="op">/</span>Company<span class="op">/</span>MonoRepo<span class="op">:</span>juliapkgs<span class="op">/</span>Package.jl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can then add a package using the <code>add</code> command. The argument of <code>add</code> can be either a registered Julia package, for example we show here how to add the <a href="https://github.com/Julia-Tempering/Pigeons.jl">Pigeons package</a> for MCMC sampling:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cn">ENV</span>[<span class="st">"JULIA_PKG_PRECOMPILE_AUTO"</span>]<span class="op">=</span><span class="fl">0</span> <span class="co"># Hold off precompile since we are in login node</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>activate experiment_repo<span class="op">/</span>julia_env</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>add Pigeons</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Alternatively, the package can be a git repository, optionally with a specific commit/tag:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>add Example@<span class="fl">0.5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>add Example<span class="co">#master</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>add Example<span class="co">#c37b675</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>add https<span class="op">://</span>github.com<span class="op">/</span>JuliaLang<span class="op">/</span>Example.jl<span class="co">#master</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>add git<span class="pp">@github</span>.com<span class="op">:</span>JuliaLang<span class="op">/</span>Example.jl.git</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>add <span class="st">"git@github.com:JuliaLang/Example.jl.git"</span><span class="co">#master</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>add https<span class="op">://</span>github.com<span class="op">/</span>Company<span class="op">/</span>MonoRepo<span class="op">:</span>juliapkgs<span class="op">/</span>Package.jl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To exit the interactive Julia package manager, type <code>control-C</code>.</p>
 </section>
 <section id="programmatic-interface" class="level3">
 <h3 class="anchored" data-anchor-id="programmatic-interface">Programmatic interface</h3>
 <p>Alternatively, a programmatic interface is also available for scripting:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cn">ENV</span>[<span class="st">"JULIA_PKG_PRECOMPILE_AUTO"</span>]<span class="op">=</span><span class="fl">0</span> <span class="co"># Hold off precompile since we are in login node</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"experiment_repo/julia_env"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">add</span>(<span class="st">"Pigeons"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cn">ENV</span>[<span class="st">"JULIA_PKG_PRECOMPILE_AUTO"</span>]<span class="op">=</span><span class="fl">0</span> <span class="co"># Hold off precompile since we are in login node</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"experiment_repo/julia_env"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">add</span>(<span class="st">"Pigeons"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -273,8 +277,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="precompilation-on-hpc">Precompilation on HPC</h2>
 <p>Once we have downloaded the packages in the login node, we now turn to the task of performing pre-compilation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/pkg.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/pkg.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
 Launching `nf-nest/pkg.nf` [clever_aryabhata] DSL2 - revision: 869ec1e084
@@ -289,12 +293,16 @@ Launching `nf-nest/pkg.nf` [clever_aryabhata] DSL2 - revision: 869ec1e084
 <p>In the code above, we have added the package <a href="https://github.com/Julia-Tempering/Pigeons.jl">Pigeons</a> as an example.</p>
 <p>To interactively test an installed package, simply activate the environment from a Julia session:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"experiment_repo/julia_env"</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pigeons</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pigeons</span>(target <span class="op">=</span> <span class="fu">toy_mvn_target</span>(<span class="fl">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"experiment_repo/julia_env"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pigeons</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pigeons</span>(target <span class="op">=</span> <span class="fu">toy_mvn_target</span>(<span class="fl">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="more-information" class="level2">
+<h2 class="anchored" data-anchor-id="more-information">More information</h2>
+<p>See <a href="https://pkgdocs.julialang.org/v1/">Pkg.jl documentation</a>.</p>
 
 
 </section>

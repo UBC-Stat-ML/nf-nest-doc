@@ -195,7 +195,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#example-nextflow-script" id="toc-example-nextflow-script" class="nav-link" data-scroll-target="#example-nextflow-script">Example nextflow script</a></li>
   <li><a href="#local-execution" id="toc-local-execution" class="nav-link" data-scroll-target="#local-execution">Local execution</a></li>
   <li><a href="#cluster-execution" id="toc-cluster-execution" class="nav-link" data-scroll-target="#cluster-execution">Cluster execution</a></li>
-  <li><a href="#keeping-long-cluster-executions-alive" id="toc-keeping-long-cluster-executions-alive" class="nav-link" data-scroll-target="#keeping-long-cluster-executions-alive">Keeping long cluster executions alive</a></li>
+  <li><a href="#managing-long-executions" id="toc-managing-long-executions" class="nav-link" data-scroll-target="#managing-long-executions">Managing long executions</a>
+  <ul class="collapse">
+  <li><a href="#basic-instructions-to-start-a-long-job" id="toc-basic-instructions-to-start-a-long-job" class="nav-link" data-scroll-target="#basic-instructions-to-start-a-long-job">Basic instructions to start a long job</a></li>
+  <li><a href="#look-at-the-status-after-being-disconnected" id="toc-look-at-the-status-after-being-disconnected" class="nav-link" data-scroll-target="#look-at-the-status-after-being-disconnected">Look at the status after being disconnected</a></li>
+  <li><a href="#cancelling-a-nextflow-workflow" id="toc-cancelling-a-nextflow-workflow" class="nav-link" data-scroll-target="#cancelling-a-nextflow-workflow">Cancelling a nextflow workflow</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -277,11 +282,34 @@ Hello world!</code></pre>
 </div>
 </div>
 </section>
-<section id="keeping-long-cluster-executions-alive" class="level2">
-<h2 class="anchored" data-anchor-id="keeping-long-cluster-executions-alive">Keeping long cluster executions alive</h2>
-<p>TODO: screen and tmux</p>
+<section id="managing-long-executions" class="level2">
+<h2 class="anchored" data-anchor-id="managing-long-executions">Managing long executions</h2>
+<p>When starting a job, the launching nextflow process needs to stay alive until the end of the last job. However, when the SSH connection is lost (e.g., you close your laptop), the nextflow process and hence child jobs will be killed. To avoid this, use <code>screen</code> or <code>tmux</code> which allows you to preserve a SSH session even if the SSH connection is closed.</p>
+<section id="basic-instructions-to-start-a-long-job" class="level3">
+<h3 class="anchored" data-anchor-id="basic-instructions-to-start-a-long-job">Basic instructions to start a long job</h3>
+<ul>
+<li>Take note of which of the login nodes you are starting the job (e.g.&nbsp;in Sockeye, <code>login01</code>, <code>login02</code> or <code>login03</code>).</li>
+<li>List existing tmux sessions with <code>tmux ls</code></li>
+<li>Create one with <code>tmux</code> or join last one with <code>tmux a</code></li>
+<li>Start the nextflow.</li>
+<li>To detach the tmux session <code>ctrl-b</code> followed by <code>d</code></li>
+</ul>
+</section>
+<section id="look-at-the-status-after-being-disconnected" class="level3">
+<h3 class="anchored" data-anchor-id="look-at-the-status-after-being-disconnected">Look at the status after being disconnected</h3>
+<ul>
+<li>SSH in.</li>
+<li>If you are in the wrong login node, use e.g., <code>ssh login02</code> (follow 2FA instruction)</li>
+<li>Reattach with <code>tmux a</code></li>
+</ul>
+<p>For more information on tmux, <a href="https://tmuxcheatsheet.com/">use this cheat sheet</a>.</p>
+</section>
+<section id="cancelling-a-nextflow-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="cancelling-a-nextflow-workflow">Cancelling a nextflow workflow</h3>
+<p>Press <code>ctrl-c</code> only once. This will instruct nextflow to clean up children jobs: killing running jobs, as well as cancelling queued jobs.</p>
 
 
+</section>
 </section>
 
 
