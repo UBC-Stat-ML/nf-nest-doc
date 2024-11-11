@@ -183,6 +183,8 @@ export JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/depot
 
 ## Optional: useful aliases
 
+Bash supports shortcuts called alias for commonly used commands. We show two use cases here.
+
 A very common patter in Julia is to activate the environment in the current directory and load
 [Revise.jl](https://timholy.github.io/Revise.jl/stable/). To do so, create a
 Julia script in your home directory called `julia-start.jl` and put that in it:
@@ -197,6 +199,15 @@ Then add the following to `.bashrc`:
 
 ```bash
 alias j='julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. ' 
+```
+
+You will need to install Revise.jl in the global environment:
+
+```bash
+julia
+]
+activate
+add Revise 
 ```
 
 Second, most HPC has some ways to start an interactive allocation. Create an alias 

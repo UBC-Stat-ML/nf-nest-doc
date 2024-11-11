@@ -60,6 +60,32 @@ cd experiment_repo
 ```
 
 
-## Keeping long cluster executions alive 
+## Managing long executions
 
-TODO: screen and tmux
+When starting a job, the launching nextflow process needs to stay alive until the end of the last job. 
+However, when the SSH connection is lost (e.g., you close your laptop), the nextflow process and hence 
+child jobs will be killed. To avoid this, use `screen` or `tmux` which allows you to preserve a SSH 
+session even if the SSH connection is closed. 
+
+### Basic instructions to start a long job
+
+- Take note of which of the login nodes you are starting the job (e.g. in Sockeye, `login01`, `login02` or `login03`). 
+- List existing tmux sessions with `tmux ls` 
+- Create one with `tmux` or join last one with `tmux a`
+- Start the nextflow.
+- To detach the tmux session `ctrl-b` followed by `d` 
+
+
+### Look at the status after being disconnected
+
+- SSH in. 
+- If you are in the wrong login node, use e.g., `ssh login02` (follow 2FA instruction)
+- Reattach with `tmux a`
+
+For more information on tmux, [use this cheat sheet](https://tmuxcheatsheet.com/).
+
+
+### Cancelling a nextflow workflow
+
+Press `ctrl-c` only once. This will instruct nextflow to clean up children jobs:
+killing running jobs, as well as cancelling queued jobs. 

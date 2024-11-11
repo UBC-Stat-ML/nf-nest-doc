@@ -5,9 +5,18 @@ engine: knitr
 
 ## Overview 
 
-TODO: something about how if you are on your laptop follow simpler instructions
+Installing a package in Julia includes two steps (1) downloading (2) pre-compiling.
+In a laptop, both are done in one shot using 
 
-TODO: background on pkg, HPC limitations
+```julia
+]
+activate experiment_repo/julia_env
+add NameOfPackage
+```
+
+In an HPC setup, step (2) requires computational effort hence is best done in compute node. However 
+in some HPC setups such as Sockeye, compute nodes do not have internet access, so the 
+process needs to be split. We cover here some utilities that facilitate this.
 
 
 ## Julia environment
@@ -21,7 +30,7 @@ directory called `experiment_repo/julia_env`.
 
 ## Adding a package
 
-Then there are two syntaxes in Julia to install packages: the 
+There are two syntaxes in Julia to install packages: the 
 interactive Julia package manager or using programmatic Pkg 
 syntax. We cover both below. 
 
@@ -37,7 +46,10 @@ manager. To start it, type `]` followed by `enter`.
 Activating is done with the `activate` keyword. 
 
 You can then add a package using the `add` command. The argument of 
-`add` can be either a registered Julia package, as in:
+`add` can be either a registered Julia package, for example 
+we show here how to add the 
+[Pigeons package](https://github.com/Julia-Tempering/Pigeons.jl) 
+for MCMC sampling:
 
 ```julia
 ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0 # Hold off precompile since we are in login node
@@ -46,7 +58,7 @@ activate experiment_repo/julia_env
 add Pigeons
 ```
 
-or it can be a git repository, optionally with a specific 
+Alternatively, the package can be a git repository, optionally with a specific 
 commit/tag:
 
 ```julia
@@ -107,3 +119,6 @@ pigeons(target = toy_mvn_target(1000))
 ```
 
 
+## More information
+
+See [Pkg.jl documentation](https://pkgdocs.julialang.org/v1/).
