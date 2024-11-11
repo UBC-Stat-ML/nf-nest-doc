@@ -192,9 +192,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  <li><a href="#optional-password-less-ssh" id="toc-optional-password-less-ssh" class="nav-link" data-scroll-target="#optional-password-less-ssh">Optional: Password-less SSH</a></li>
+  <li><a href="#optional-install-vs-code" id="toc-optional-install-vs-code" class="nav-link" data-scroll-target="#optional-install-vs-code">Optional: Install VS Code</a></li>
+  <li><a href="#understanding-start-up-files" id="toc-understanding-start-up-files" class="nav-link" data-scroll-target="#understanding-start-up-files">Understanding start up files</a></li>
+  <li><a href="#git" id="toc-git" class="nav-link" data-scroll-target="#git">Git</a></li>
   <li><a href="#allocation-code" id="toc-allocation-code" class="nav-link" data-scroll-target="#allocation-code">Allocation code</a></li>
-  <li><a href="#optional-disable-fancy-nextflow-fancy-output" id="toc-optional-disable-fancy-nextflow-fancy-output" class="nav-link" data-scroll-target="#optional-disable-fancy-nextflow-fancy-output">Optional: disable fancy nextflow fancy output</a></li>
-  <li><a href="#todo" id="toc-todo" class="nav-link" data-scroll-target="#todo">TODO</a></li>
+  <li><a href="#optional-disable-nextflow-fancy-output" id="toc-optional-disable-nextflow-fancy-output" class="nav-link" data-scroll-target="#optional-disable-nextflow-fancy-output">Optional: disable nextflow fancy output</a></li>
+  <li><a href="#java" id="toc-java" class="nav-link" data-scroll-target="#java">Java</a></li>
+  <li><a href="#install-julia" id="toc-install-julia" class="nav-link" data-scroll-target="#install-julia">Install Julia</a></li>
+  <li><a href="#julia-depot" id="toc-julia-depot" class="nav-link" data-scroll-target="#julia-depot">Julia depot</a></li>
+  <li><a href="#optional-useful-aliases" id="toc-optional-useful-aliases" class="nav-link" data-scroll-target="#optional-useful-aliases">Optional: useful aliases</a></li>
   </ul>
 </nav>
     </div>
@@ -224,50 +232,120 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>You will need to go through these setup instructions before using nf-nest. This needs to be done only once per user and per cluster.</p>
 </section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Working knowledge of unix (files, permissions, processes, environment variables).</li>
+<li>Working knowledge of git.</li>
+</ul>
+<p>There are countless web resources to learn those things. Tedious but worth the investment.</p>
+</section>
+<section id="optional-password-less-ssh" class="level2">
+<h2 class="anchored" data-anchor-id="optional-password-less-ssh">Optional: Password-less SSH</h2>
+<p>It is imperative for your sanity to avoid entering your password and do 2FA every time a SSH connection is needed.</p>
+<p>For example, on Sockeye, the closest you can get to that is with <a href="https://confluence.it.ubc.ca/display/UARC/SSH+Connection+Sharing">SSH Connection Sharing</a>. This means that you open a first terminal window and perform 2FA in it. As long as that window is open, other SSH connections can be established without password and 2FA. Minimize that first window and do not touch it.</p>
+</section>
+<section id="optional-install-vs-code" class="level2">
+<h2 class="anchored" data-anchor-id="optional-install-vs-code">Optional: Install VS Code</h2>
+<p>VS Code makes it easier to develop on a remote server. For example, it simplifies file editing, resuming your session, manages github credential for you, etc.</p>
+<ul>
+<li>On your laptop, install VSCode.</li>
+<li>Follow two steps documented in the <a href="https://code.visualstudio.com/docs/remote/ssh-tutorial">VS Code website</a>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/remote/ssh-tutorial#_install-the-extension">Install the SSH extension</a></li>
+<li><a href="https://code.visualstudio.com/docs/remote/ssh-tutorial#_install-the-extension">Click on the Remote SSH icon in the lower left,</a> this will let you <code>Connect to Remote Host</code>.</li>
+</ul></li>
+</ul>
+<p>Use <code>New Terminal</code> to open a terminal. Once you have a project (git repo) where you develop ready, use <code>Open Folder...</code> to point VS Code to the root of your project. VS Code is also able to manage your github authentification.</p>
+</section>
+<section id="understanding-start-up-files" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-start-up-files">Understanding start up files</h2>
+<p>Bash (and its cousins such as zsh) are used in two main ways:</p>
+<ol type="1">
+<li>When you login via SSH.</li>
+<li>After being logged in, bash can be called by another process (e.g.&nbsp;bash, VS Code).</li>
+</ol>
+<p>VS Code internally uses <code>1</code> once but hides it, and when a new terminal in VS Code is opened, it is done via <code>2</code>.</p>
+<p>When bash is started with <code>1</code>, the file <code>~/.bash_profile</code> is called. When bash is started with <code>2</code>, the file <code>~/.bashrc</code> is <strong>sometimes</strong> called.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Since we do <code>2</code> more frequently, we want it to be fast. It is OK if some operations in <code>1</code> are a bit slow because it is less frequently called.</p>
+<p>Typically anything in <code>2</code> we want it to happen in <code>1</code> as well. So use this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># put that in .bash_profile so that anything in .bashrc also gets loaded</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-f</span> ~/.bashrc <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">.</span> ~/.bashrc</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Recall that any environment variables with <code>export</code> are passed in to child process. So no need to set them every time in <code>2</code>, instead you can set them once and for all in <code>1</code> (but then you need to login again for this take effect).</p>
+<p>On the other hand, aything with <code>alias</code>, <code>module</code>, etc, is not propagated.</p>
+</section>
+<section id="git" class="level2">
+<h2 class="anchored" data-anchor-id="git">Git</h2>
+<p>We assume the command <code>git</code> is available.</p>
+<p>In some HPC such as UBC Sockeye, this command is not available by default, instead a module has to be loaded:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="allocation-code" class="level2">
 <h2 class="anchored" data-anchor-id="allocation-code">Allocation code</h2>
 <p>In some HPC such as UBC Sockeye, we need an allocation code to submit to the job queue. Scripts in nf-nest use an ENV variable called <code>ALLOCATION_CODE</code> to find the allocation code.</p>
 <p>To set the variable in your current session, use:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ALLOCATION_CODE</span><span class="op">=</span>my-alloc-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ALLOCATION_CODE</span><span class="op">=</span>my-alloc-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>To automatically set this variable for next time you login:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"export ALLOCATION_CODE=my-alloc-code"</span> <span class="op">&gt;&gt;</span> ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="optional-disable-fancy-nextflow-fancy-output" class="level2">
-<h2 class="anchored" data-anchor-id="optional-disable-fancy-nextflow-fancy-output">Optional: disable fancy nextflow fancy output</h2>
+<section id="optional-disable-nextflow-fancy-output" class="level2">
+<h2 class="anchored" data-anchor-id="optional-disable-nextflow-fancy-output">Optional: disable nextflow fancy output</h2>
 <p>It can be useful to avoid nextflow’s fancy progress output, for example they do not work well in notebook or in <code>screen</code>.</p>
 <p>To disable in the current session, use:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">NXF_ANSI_LOG</span><span class="op">=</span>false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">NXF_ANSI_LOG</span><span class="op">=</span>false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>To automatically set this variable for next time you login:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"export NXF_ANSI_LOG=false"</span> <span class="op">&gt;&gt;</span> ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="todo" class="level2">
-<h2 class="anchored" data-anchor-id="todo">TODO</h2>
-<ul>
-<li><p>basic modules</p></li>
-<li><p>Github setup</p></li>
-<li><p>Java</p></li>
-<li><p>Julia</p></li>
-<li><p>symlinks</p></li>
-<li><p>j command</p></li>
-<li><p>aliases</p></li>
-<li><p>depot?</p></li>
-<li><p>allocation code</p></li>
-<li><p>scripts</p>
-<ul>
-<li>create-exp-repo</li>
-</ul></li>
-<li><p>VS Code (resume, github credentials)</p></li>
-<li><p>Docker</p></li>
-</ul>
+<section id="java" class="level2">
+<h2 class="anchored" data-anchor-id="java">Java</h2>
+<p>Nextflow needs Java. Follow these instructions <a href="https://www.nextflow.io/docs/latest/install.html">taken from the nextflow website</a>:</p>
+<p>First, <a href="https://sdkman.io/install/">Install SDKMAN</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> https://get.sdkman.io <span class="kw">|</span> <span class="fu">bash</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Second, open a new terminal, and install Java:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sdk</span> install java 17.0.10-tem</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finally, confirm that Java in installed correctly:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">java</span> <span class="at">-version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="install-julia" class="level2">
+<h2 class="anchored" data-anchor-id="install-julia">Install Julia</h2>
+<p>At the time of writing, Julia 1.11 is causing various issues, so install Julia 1.10 using the <a href="https://julialang.org/downloads/platform/#linux_and_freebsd">“Linux and FreeBSD” instructions</a> but using the URL for the <a href="https://julialang.org/downloads/#long_term_support_release">Long-term support version 1.10.6</a>.</p>
+<p>You do not need root privileges, e.g., install in a folder at <code>~/bin/</code> and add to your path.</p>
+</section>
+<section id="julia-depot" class="level2">
+<h2 class="anchored" data-anchor-id="julia-depot">Julia depot</h2>
+<p>Julia has a package manager called <code>Pkg</code>. The Julia depot folder is a location where <code>Pkg</code> puts files it downloads and compiles. Each user should have their own. The path to the depot is controlled via the <a href="https://docs.julialang.org/en/v1/manual/environment-variables/#JULIA_DEPOT_PATH"><code>JULIA_DEPOT_PATH</code> environment variable</a>.</p>
+<p>In a HPC setup, the <code>JULIA_DEPOT_PATH</code> should be accessible read/write by all nodes, and ideally be on fast storage.</p>
+<p>For example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e.&nbsp;path of the form</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JULIA_DEPOT_PATH</span><span class="op">=</span>/arc/burst/<span class="pp">[</span><span class="ss">allocation_code</span><span class="pp">]</span>/<span class="pp">[</span><span class="ss">username_in_alloc</span><span class="pp">]</span>/depot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A second choice would be to use the scratch space</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JULIA_DEPOT_PATH</span><span class="op">=</span>/scratch/<span class="pp">[</span><span class="ss">allocation_code</span><span class="pp">]</span>/<span class="pp">[</span><span class="ss">username_in_alloc</span><span class="pp">]</span>/depot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="optional-useful-aliases" class="level2">
+<h2 class="anchored" data-anchor-id="optional-useful-aliases">Optional: useful aliases</h2>
+<p>A very common patter in Julia is to activate the environment in the current directory and load <a href="https://timholy.github.io/Revise.jl/stable/">Revise.jl</a>. To do so, create a Julia script in your home directory called <code>julia-start.jl</code> and put that in it:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Active project: </span><span class="sc">$</span>(<span class="bu">Base</span>.<span class="fu">active_project</span>())<span class="st">"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Loading Revise..."</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Revise</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then add the following to <code>.bashrc</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> j=<span class="st">'julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. '</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Second, most HPC has some ways to start an interactive allocation. Create an alias to be able to do it quicly. Here is an example for interactive CPU and GPU nodes respectively on Sockeye:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> interact=<span class="st">'salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> ginteract=<span class="st">'salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>We emphasize “sometimes” here: for example, when nextflow calls bash, to make things reproducible, it does <strong>not</strong> automatically pass environment variables. They have to be set explicitly using <a href="https://www.nextflow.io/docs/latest/process.html#input-environment-variables-env">input environment variables</a>. More generally, any parent process is free to decide which environment variables to propagate to its child. Bash uses <code>export</code> to make this decision automatically when it starts a child. Other languages such as nextflow make different decisions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -140,53 +140,143 @@
     ]
   },
   {
-    "objectID": "06_cross_product.html",
-    "href": "06_cross_product.html",
-    "title": "Job cross products",
+    "objectID": "02_setup.html",
+    "href": "02_setup.html",
+    "title": "Setting up your HPC account",
     "section": "",
-    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
+    "text": "You will need to go through these setup instructions before using nf-nest. This needs to be done only once per user and per cluster.",
     "crumbs": [
-      "Job cross products"
+      "Setup your HPC account"
     ]
   },
   {
-    "objectID": "06_cross_product.html#overview",
-    "href": "06_cross_product.html#overview",
-    "title": "Job cross products",
+    "objectID": "02_setup.html#overview",
+    "href": "02_setup.html#overview",
+    "title": "Setting up your HPC account",
     "section": "",
-    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
+    "text": "You will need to go through these setup instructions before using nf-nest. This needs to be done only once per user and per cluster.",
     "crumbs": [
-      "Job cross products"
+      "Setup your HPC account"
     ]
   },
   {
-    "objectID": "06_cross_product.html#example",
-    "href": "06_cross_product.html#example",
-    "title": "Job cross products",
-    "section": "Example",
-    "text": "Example\nAs a toy example, suppose we want to compute all additions of the form a + b where a and b are integers from 1 to 3. In addition, we also want a * b. This means we will need \\(3 \\times 3 \\times 2\\) calculations.\nWe can characterize the inputs a the cross-product denoted \\(\\{1, 2, 3\\} \\times \\{1, 2, 3\\} \\times \\{+, *\\}\\).",
+    "objectID": "02_setup.html#prerequisites",
+    "href": "02_setup.html#prerequisites",
+    "title": "Setting up your HPC account",
+    "section": "Prerequisites",
+    "text": "Prerequisites\n\nWorking knowledge of unix (files, permissions, processes, environment variables).\nWorking knowledge of git.\n\nThere are countless web resources to learn those things. Tedious but worth the investment.",
     "crumbs": [
-      "Job cross products"
+      "Setup your HPC account"
     ]
   },
   {
-    "objectID": "06_cross_product.html#nextflow-script",
-    "href": "06_cross_product.html#nextflow-script",
-    "title": "Job cross products",
-    "section": "Nextflow script",
-    "text": "Nextflow script\nThe script below will perform the following operations.\n\n// we use utilities in the nf-nest submodule\n// in user scripts, path would be './nf-nest/cross.nf' \ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\n\ndef variables = [\n    first: 1..3,\n    second: 1..3,\n    operation: [\"+\", \"*\"]\n]\n\n// specifies the order of operations\nworkflow {\n    // look at all combinations of variables\n    configs = crossProduct(variables)\n    // run Julia on 18 nodes!\n    run_julia(configs)\n\n    // equivalent syntax:\n    // crossProduct(variables) | run_julia\n}\n\nprocess run_julia {\n    debug true // by default, standard out is not shown, use this to show it\n    \n    // information used when submitting job to queue\n    time 2.min\n    cpus 1 \n    memory 5.GB\n\n    input:\n        val config \n    \"\"\"\n    ${activate()}\n    # ^ this is just a shortcut for:\n    #!/usr/bin/env julia --threads=1\n\n    @show ${config.first} ${config.operation} ${config.second}\n    \"\"\"\n}\n\nFor more information:\n\nRead on the nextflow scripting language\nRead on nextflow’s process block\nconfigs in the above is an example of a nextflow Channel\nMore on nextflow’s workflow block",
+    "objectID": "02_setup.html#optional-password-less-ssh",
+    "href": "02_setup.html#optional-password-less-ssh",
+    "title": "Setting up your HPC account",
+    "section": "Optional: Password-less SSH",
+    "text": "Optional: Password-less SSH\nIt is imperative for your sanity to avoid entering your password and do 2FA every time a SSH connection is needed.\nFor example, on Sockeye, the closest you can get to that is with SSH Connection Sharing. This means that you open a first terminal window and perform 2FA in it. As long as that window is open, other SSH connections can be established without password and 2FA. Minimize that first window and do not touch it.",
     "crumbs": [
-      "Job cross products"
+      "Setup your HPC account"
     ]
   },
   {
-    "objectID": "06_cross_product.html#running-the-script",
-    "href": "06_cross_product.html#running-the-script",
-    "title": "Job cross products",
-    "section": "Running the script",
-    "text": "Running the script\nRunning it with the -profile cluster option will:\n\nbuild a cross-product from variables\nfor each one, automatically create submission scripts\nrun these Julia processes and show the standard out.\n\nFrom the command line, running the script is done as follows:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/many_jobs.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/many_jobs.nf` [marvelous_shockley] DSL2 - revision: aa082b1978\n[cb/6e887f] Submitted process &gt; run_julia (11)\n[a6/bdf5ad] Submitted process &gt; run_julia (14)\n[47/0b890b] Submitted process &gt; run_julia (7)\n[b6/c30b43] Submitted process &gt; run_julia (15)\n[47/d19288] Submitted process &gt; run_julia (10)\n[a4/d0eb7e] Submitted process &gt; run_julia (5)\n[8c/a6e0e1] Submitted process &gt; run_julia (2)\n[39/758dad] Submitted process &gt; run_julia (8)\n[be/865d39] Submitted process &gt; run_julia (6)\n[cc/33ee89] Submitted process &gt; run_julia (4)\n[8a/538ece] Submitted process &gt; run_julia (1)\n[c6/d831eb] Submitted process &gt; run_julia (3)\n[47/0601e5] Submitted process &gt; run_julia (13)\n[bc/17cd3c] Submitted process &gt; run_julia (9)\n[28/892f35] Submitted process &gt; run_julia (16)\n[e8/91516e] Submitted process &gt; run_julia (12)\n[58/af841a] Submitted process &gt; run_julia (17)\n[35/c3804f] Submitted process &gt; run_julia (18)\n3 * 1 = 3\n3 + 2 = 5\n2 + 1 = 3\n2 + 3 = 5\n2 * 2 = 4\n1 + 3 = 4\n1 * 1 = 1\n2 * 1 = 2\n1 * 3 = 3\n1 * 2 = 2\n1 + 1 = 2\n1 + 2 = 3\n3 + 1 = 4\n2 + 2 = 4\n3 * 2 = 6\n2 * 3 = 6\n3 + 3 = 6\n3 * 3 = 9",
+    "objectID": "02_setup.html#optional-install-vs-code",
+    "href": "02_setup.html#optional-install-vs-code",
+    "title": "Setting up your HPC account",
+    "section": "Optional: Install VS Code",
+    "text": "Optional: Install VS Code\nVS Code makes it easier to develop on a remote server. For example, it simplifies file editing, resuming your session, manages github credential for you, etc.\n\nOn your laptop, install VSCode.\nFollow two steps documented in the VS Code website\n\nInstall the SSH extension\nClick on the Remote SSH icon in the lower left, this will let you Connect to Remote Host.\n\n\nUse New Terminal to open a terminal. Once you have a project (git repo) where you develop ready, use Open Folder... to point VS Code to the root of your project. VS Code is also able to manage your github authentification.",
     "crumbs": [
-      "Job cross products"
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#understanding-start-up-files",
+    "href": "02_setup.html#understanding-start-up-files",
+    "title": "Setting up your HPC account",
+    "section": "Understanding start up files",
+    "text": "Understanding start up files\nBash (and its cousins such as zsh) are used in two main ways:\n\nWhen you login via SSH.\nAfter being logged in, bash can be called by another process (e.g. bash, VS Code).\n\nVS Code internally uses 1 once but hides it, and when a new terminal in VS Code is opened, it is done via 2.\nWhen bash is started with 1, the file ~/.bash_profile is called. When bash is started with 2, the file ~/.bashrc is sometimes called.1\nSince we do 2 more frequently, we want it to be fast. It is OK if some operations in 1 are a bit slow because it is less frequently called.\nTypically anything in 2 we want it to happen in 1 as well. So use this:\n# put that in .bash_profile so that anything in .bashrc also gets loaded\nif [ -f ~/.bashrc ]; then\n    . ~/.bashrc\nfi\nRecall that any environment variables with export are passed in to child process. So no need to set them every time in 2, instead you can set them once and for all in 1 (but then you need to login again for this take effect).\nOn the other hand, aything with alias, module, etc, is not propagated.",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#git",
+    "href": "02_setup.html#git",
+    "title": "Setting up your HPC account",
+    "section": "Git",
+    "text": "Git\nWe assume the command git is available.\nIn some HPC such as UBC Sockeye, this command is not available by default, instead a module has to be loaded:\n\nmodule load git",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#allocation-code",
+    "href": "02_setup.html#allocation-code",
+    "title": "Setting up your HPC account",
+    "section": "Allocation code",
+    "text": "Allocation code\nIn some HPC such as UBC Sockeye, we need an allocation code to submit to the job queue. Scripts in nf-nest use an ENV variable called ALLOCATION_CODE to find the allocation code.\nTo set the variable in your current session, use:\n\nexport ALLOCATION_CODE=my-alloc-code",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#optional-disable-nextflow-fancy-output",
+    "href": "02_setup.html#optional-disable-nextflow-fancy-output",
+    "title": "Setting up your HPC account",
+    "section": "Optional: disable nextflow fancy output",
+    "text": "Optional: disable nextflow fancy output\nIt can be useful to avoid nextflow’s fancy progress output, for example they do not work well in notebook or in screen.\nTo disable in the current session, use:\n\nexport NXF_ANSI_LOG=false",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#java",
+    "href": "02_setup.html#java",
+    "title": "Setting up your HPC account",
+    "section": "Java",
+    "text": "Java\nNextflow needs Java. Follow these instructions taken from the nextflow website:\nFirst, Install SDKMAN\ncurl -s https://get.sdkman.io | bash\nSecond, open a new terminal, and install Java:\nsdk install java 17.0.10-tem\nFinally, confirm that Java in installed correctly:\njava -version",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#install-julia",
+    "href": "02_setup.html#install-julia",
+    "title": "Setting up your HPC account",
+    "section": "Install Julia",
+    "text": "Install Julia\nAt the time of writing, Julia 1.11 is causing various issues, so install Julia 1.10 using the “Linux and FreeBSD” instructions but using the URL for the Long-term support version 1.10.6.\nYou do not need root privileges, e.g., install in a folder at ~/bin/ and add to your path.",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#julia-depot",
+    "href": "02_setup.html#julia-depot",
+    "title": "Setting up your HPC account",
+    "section": "Julia depot",
+    "text": "Julia depot\nJulia has a package manager called Pkg. The Julia depot folder is a location where Pkg puts files it downloads and compiles. Each user should have their own. The path to the depot is controlled via the JULIA_DEPOT_PATH environment variable.\nIn a HPC setup, the JULIA_DEPOT_PATH should be accessible read/write by all nodes, and ideally be on fast storage.\nFor example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. path of the form\nexport JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/depot\nA second choice would be to use the scratch space\nexport JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/depot",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#optional-useful-aliases",
+    "href": "02_setup.html#optional-useful-aliases",
+    "title": "Setting up your HPC account",
+    "section": "Optional: useful aliases",
+    "text": "Optional: useful aliases\nA very common patter in Julia is to activate the environment in the current directory and load Revise.jl. To do so, create a Julia script in your home directory called julia-start.jl and put that in it:\nprintln(\"Active project: $(Base.active_project())\")\nprintln(\"Loading Revise...\")\nusing Revise\nThen add the following to .bashrc:\nalias j='julia --banner=no --load /home/[your_alloc]/julia-start.jl --project=@. ' \nSecond, most HPC has some ways to start an interactive allocation. Create an alias to be able to do it quicly. Here is an example for interactive CPU and GPU nodes respectively on Sockeye:\nalias interact='salloc --time=3:00:00 --mem=16G --nodes=1 --ntasks=2 --account=[your_alloc]'\nalias ginteract='salloc --account=[your_alloc-gpu] --partition=interactive_gpu --time=3:00:00 -N 1 -n 2 --mem=16G --gpus=1'",
+    "crumbs": [
+      "Setup your HPC account"
+    ]
+  },
+  {
+    "objectID": "02_setup.html#footnotes",
+    "href": "02_setup.html#footnotes",
+    "title": "Setting up your HPC account",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nWe emphasize “sometimes” here: for example, when nextflow calls bash, to make things reproducible, it does not automatically pass environment variables. They have to be set explicitly using input environment variables. More generally, any parent process is free to decide which environment variables to propagate to its child. Bash uses export to make this decision automatically when it starts a child. Other languages such as nextflow make different decisions.↩︎",
+    "crumbs": [
+      "Setup your HPC account"
     ]
   },
   {
@@ -240,53 +330,53 @@
     ]
   },
   {
-    "objectID": "02_setup.html",
-    "href": "02_setup.html",
-    "title": "Setting up your HPC account",
+    "objectID": "06_cross_product.html",
+    "href": "06_cross_product.html",
+    "title": "Job cross products",
     "section": "",
-    "text": "You will need to go through these setup instructions before using nf-nest. This needs to be done only once per user and per cluster.",
+    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
     "crumbs": [
-      "Setup your HPC account"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "02_setup.html#overview",
-    "href": "02_setup.html#overview",
-    "title": "Setting up your HPC account",
+    "objectID": "06_cross_product.html#overview",
+    "href": "06_cross_product.html#overview",
+    "title": "Job cross products",
     "section": "",
-    "text": "You will need to go through these setup instructions before using nf-nest. This needs to be done only once per user and per cluster.",
+    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
     "crumbs": [
-      "Setup your HPC account"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "02_setup.html#allocation-code",
-    "href": "02_setup.html#allocation-code",
-    "title": "Setting up your HPC account",
-    "section": "Allocation code",
-    "text": "Allocation code\nIn some HPC such as UBC Sockeye, we need an allocation code to submit to the job queue. Scripts in nf-nest use an ENV variable called ALLOCATION_CODE to find the allocation code.\nTo set the variable in your current session, use:\n\nexport ALLOCATION_CODE=my-alloc-code\n\nTo automatically set this variable for next time you login:\necho \"export ALLOCATION_CODE=my-alloc-code\" &gt;&gt; ~/.bashrc",
+    "objectID": "06_cross_product.html#example",
+    "href": "06_cross_product.html#example",
+    "title": "Job cross products",
+    "section": "Example",
+    "text": "Example\nAs a toy example, suppose we want to compute all additions of the form a + b where a and b are integers from 1 to 3. In addition, we also want a * b. This means we will need \\(3 \\times 3 \\times 2\\) calculations.\nWe can characterize the inputs a the cross-product denoted \\(\\{1, 2, 3\\} \\times \\{1, 2, 3\\} \\times \\{+, *\\}\\).",
     "crumbs": [
-      "Setup your HPC account"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "02_setup.html#optional-disable-fancy-nextflow-fancy-output",
-    "href": "02_setup.html#optional-disable-fancy-nextflow-fancy-output",
-    "title": "Setting up your HPC account",
-    "section": "Optional: disable fancy nextflow fancy output",
-    "text": "Optional: disable fancy nextflow fancy output\nIt can be useful to avoid nextflow’s fancy progress output, for example they do not work well in notebook or in screen.\nTo disable in the current session, use:\n\nexport NXF_ANSI_LOG=false\n\nTo automatically set this variable for next time you login:\necho \"export NXF_ANSI_LOG=false\" &gt;&gt; ~/.bashrc",
+    "objectID": "06_cross_product.html#nextflow-script",
+    "href": "06_cross_product.html#nextflow-script",
+    "title": "Job cross products",
+    "section": "Nextflow script",
+    "text": "Nextflow script\nThe script below will perform the following operations.\n\n// we use utilities in the nf-nest submodule\n// in user scripts, path would be './nf-nest/cross.nf' \ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\n\ndef variables = [\n    first: 1..3,\n    second: 1..3,\n    operation: [\"+\", \"*\"]\n]\n\n// specifies the order of operations\nworkflow {\n    // look at all combinations of variables\n    configs = crossProduct(variables)\n    // run Julia on 18 nodes!\n    run_julia(configs)\n\n    // equivalent syntax:\n    // crossProduct(variables) | run_julia\n}\n\nprocess run_julia {\n    debug true // by default, standard out is not shown, use this to show it\n    \n    // information used when submitting job to queue\n    time 2.min\n    cpus 1 \n    memory 5.GB\n\n    input:\n        val config \n    \"\"\"\n    ${activate()}\n    # ^ this is just a shortcut for:\n    #!/usr/bin/env julia --threads=1\n\n    @show ${config.first} ${config.operation} ${config.second}\n    \"\"\"\n}\n\nFor more information:\n\nRead on the nextflow scripting language\nRead on nextflow’s process block\nconfigs in the above is an example of a nextflow Channel\nMore on nextflow’s workflow block",
     "crumbs": [
-      "Setup your HPC account"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "02_setup.html#todo",
-    "href": "02_setup.html#todo",
-    "title": "Setting up your HPC account",
-    "section": "TODO",
-    "text": "TODO\n\nbasic modules\nGithub setup\nJava\nJulia\nsymlinks\nj command\naliases\ndepot?\nallocation code\nscripts\n\ncreate-exp-repo\n\nVS Code (resume, github credentials)\nDocker",
+    "objectID": "06_cross_product.html#running-the-script",
+    "href": "06_cross_product.html#running-the-script",
+    "title": "Job cross products",
+    "section": "Running the script",
+    "text": "Running the script\nRunning it with the -profile cluster option will:\n\nbuild a cross-product from variables\nfor each one, automatically create submission scripts\nrun these Julia processes and show the standard out.\n\nFrom the command line, running the script is done as follows:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/many_jobs.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/many_jobs.nf` [marvelous_shockley] DSL2 - revision: aa082b1978\n[cb/6e887f] Submitted process &gt; run_julia (11)\n[a6/bdf5ad] Submitted process &gt; run_julia (14)\n[47/0b890b] Submitted process &gt; run_julia (7)\n[b6/c30b43] Submitted process &gt; run_julia (15)\n[47/d19288] Submitted process &gt; run_julia (10)\n[a4/d0eb7e] Submitted process &gt; run_julia (5)\n[8c/a6e0e1] Submitted process &gt; run_julia (2)\n[39/758dad] Submitted process &gt; run_julia (8)\n[be/865d39] Submitted process &gt; run_julia (6)\n[cc/33ee89] Submitted process &gt; run_julia (4)\n[8a/538ece] Submitted process &gt; run_julia (1)\n[c6/d831eb] Submitted process &gt; run_julia (3)\n[47/0601e5] Submitted process &gt; run_julia (13)\n[bc/17cd3c] Submitted process &gt; run_julia (9)\n[28/892f35] Submitted process &gt; run_julia (16)\n[e8/91516e] Submitted process &gt; run_julia (12)\n[58/af841a] Submitted process &gt; run_julia (17)\n[35/c3804f] Submitted process &gt; run_julia (18)\n3 * 1 = 3\n3 + 2 = 5\n2 + 1 = 3\n2 + 3 = 5\n2 * 2 = 4\n1 + 3 = 4\n1 * 1 = 1\n2 * 1 = 2\n1 * 3 = 3\n1 * 2 = 2\n1 + 1 = 2\n1 + 2 = 3\n3 + 1 = 4\n2 + 2 = 4\n3 * 2 = 6\n2 * 3 = 6\n3 + 3 = 6\n3 * 3 = 9",
     "crumbs": [
-      "Setup your HPC account"
+      "Job cross products"
     ]
   },
   {
@@ -305,6 +395,16 @@
     "title": "Creating an experiment repo",
     "section": "",
     "text": "We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.\nIt consists in a git repository with:\n\nthe nextflow executable and its configuration, nextflow.config;\na git submodule, nf-nest containing useful tools;\nyour .nf files and other supporting files.\n\nThis pages explains how to setup an experiment repo.",
+    "crumbs": [
+      "Create an experiment repo"
+    ]
+  },
+  {
+    "objectID": "03_create-exp-repo.html#location",
+    "href": "03_create-exp-repo.html#location",
+    "title": "Creating an experiment repo",
+    "section": "Location",
+    "text": "Location\nIn an HPC context, the experiment repo should be in a read/write location accessible to all nodes.\nFor example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/\nA second choice would be to use the scratch space, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/",
     "crumbs": [
       "Create an experiment repo"
     ]
