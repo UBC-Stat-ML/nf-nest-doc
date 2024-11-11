@@ -58,7 +58,11 @@ echo "export NXF_ANSI_LOG=false" >> ~/.bashrc
 
 - symlinks
 
+- j command
+
 - aliases
+
+- depot?
 
 - allocation code 
 

@@ -18,8 +18,10 @@ website:
         file: 04_launch.qmd
       - text: "Add Julia packages on HPC"
         file: 05_pkg.qmd
-      - text: "Prototypical pipeline"
-        file: 06_example-pipeline.qmd
+      - text: "Job cross products"
+        file: 06_cross_product.qmd
+      - text: "Combine outputs"
+        file: 07_combine.qmd
 
 format:
   html:

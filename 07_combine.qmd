@@ -1,0 +1,61 @@
+---
+title: "Combine outputs"
+engine: knitr
+---
+
+## Overview 
+
+Now that we know how to run many jobs, the next question is 
+how to combine the output of all these jobs to analyze it. 
+
+
+## Example
+
+We will run [Pigeons](https://github.com/Julia-Tempering/Pigeons.jl) 
+on the cross product formed by calling `crossProduct(variables)` with:
+
+```groovy
+def variables = [
+    seed: 1..10,
+    n_chains: [10, 20], 
+]
+```
+
+Suppose we want to create a plot from the output of these 
+20 Julia processes. 
+
+
+## Strategy 
+
+Each Julia process will create a folder. Using a function, 
+we will provide an automatic name to this folder encoding the 
+inputs used (`seed` and `n_chains`). That name is provided 
+by `nf-nest`'s `filed()` function. 
+In that folder, we will  
+put csv files.
+
+Then, once all Julia processes are done, another utilities 
+from `nf-nest`, `combine_csvs` will, merge all CSVs while 
+adding columns for the inputs (here, `seed` and `n_chains`).
+
+Finally, we will pass the merged CSVs to a plotting process
+
+
+## Nextflow script
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/full.nf
+```
+
+
+## Running the nextflow script
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/full.nf -profile cluster 
+nf-nest/nf-open
+```
+
+
+## Accessing the output

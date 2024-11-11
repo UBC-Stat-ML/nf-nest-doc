@@ -5,20 +5,54 @@ engine: knitr
 
 ## Overview 
 
-TODO
+Suppose you are interested in running a piece of code with many 
+different outputs, with each execution performed on a different 
+compute node of a cluster. 
 
+This page shows a streamlined way to do so. 
+
+
+## Example
+
+As a toy example, suppose we want to compute all additions 
+of the form `a + b` where `a` and `b` are integers from 1 to 3. 
+In addition, we also want `a * b`. 
+This means we will need $3 \times 3 \times 2$ calculations. 
+
+We can characterize the inputs a the cross-product denoted 
+$\{1, 2, 3\} \times \{1, 2, 3\} \times \{+, *\}$. 
+
+
+## Nextflow script
+
+The script below will perform the following operations.
 
 ```{groovy}
 #| eval: false
 #| file: experiment_repo/nf-nest/examples/many_jobs.nf
 ```
 
+For more information:
 
+- [Read on the nextflow scripting language](https://www.nextflow.io/docs/latest/script.html)
+- [Read on nextflow's `process` block](https://www.nextflow.io/docs/latest/process.html)
+- `configs` in the above is an example of a 
+    [nextflow `Channel`](https://www.nextflow.io/docs/latest/channel.html)
+- [More on nextflow's `workflow` block](https://www.nextflow.io/docs/latest/workflow.html)
+
+
+## Running the script
+
+Running it with the `-profile cluster` option will:
+
+- build a cross-product from `variables`
+- for each one, automatically create submission scripts
+- run these Julia processes and show the standard out. 
+
+From the command line, running the script is done as follows:
 
 ```{bash}
 cd experiment_repo
 ./nextflow run nf-nest/examples/many_jobs.nf -profile cluster
 ```
-
-
 

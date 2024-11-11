@@ -92,8 +92,11 @@ to request 20 threads instead of the default of 10.
 
 ## Testing your Julia environment interactively
 
-TODO: how to test the Julia env interactively
+In the code above, we have added the package 
+[Pigeons](https://github.com/Julia-Tempering/Pigeons.jl) as an example. 
 
+To interactively test an installed package, simply activate the 
+environment from a Julia session:
 
 ```{julia output = F}
 using Pkg
