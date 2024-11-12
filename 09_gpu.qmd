@@ -47,3 +47,26 @@ cd experiment_repo
 ```
 
 
+## GPU kernel development
+
+One way to leverage GPUs is to use 
+[array programming](https://cuda.juliagpu.org/stable/usage/array/) as 
+demonstrated in the example above. When a problem cannot be cast into 
+an array problem, an alternative is to construct a custom GPU kernel. 
+
+Designing custom GPU kernels is especially attractive in Julia. This is 
+in big part thanks to  
+[KernelAbstractions.jl](https://github.com/JuliaGPU/KernelAbstractions.jl), 
+which allows 
+the same code to be emit both CPU and GPU versions. 
+Since error messages are easier to interpret when doing CPU development, 
+it is useful to be able to test both CPU and GPU targets. 
+
+Compared to Julia CPU development, the main constraint when doing GPU 
+development is that inside the kernel there should not be heap allocations. 
+Seasoned Julia developers are often already often avoiding to allocate in 
+the inner loop due to garbage collection costs. 
+
+For a concrete example of KernelAbstractions.jl in action, 
+see [these kernels](https://github.com/alexandrebouchard/sais-gpu/blob/main/kernels.jl) 
+used to implement [Sequential Annealed Importance Sampling](https://arxiv.org/pdf/2408.12057).

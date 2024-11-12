@@ -94,3 +94,5 @@ Both nextflow and Julia have excellent and extensive documentation.
 
 - [Nexflow documentation](https://www.nextflow.io/docs/latest/overview.html)
 - [Julia documentation](https://docs.julialang.org/en/v1/)
+
+See also [this nextflow tutorial](https://carpentries-incubator.github.io/Pipeline_Training_with_Nextflow/01-Workflows_Pipelines/index.html).

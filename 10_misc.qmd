@@ -1,0 +1,141 @@
+---
+title: "Misc"
+engine: knitr
+---
+
+
+## Process parameters 
+
+To declare a command line argument, say `n_rounds` to your nextflow script, with 
+default argument `5`, use:
+
+```groovy
+params.n_rounds = 5
+```
+
+Here is an example:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/params.nf
+```
+
+To run it, notice that the arguments specified by `params.my_arg` should be 
+specified using `--my_arg value` (in contrast, nextflow's argument use a single dash, 
+as in `-profile cluster`):
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/params.nf -profile cluster --n_rounds 6
+```
+
+Notice that the function `deliverables(workflow, params)` takes it into account so that 
+the deliverables directory is organized correctly:
+
+```{bash}
+tree experiment_repo/deliverables
+```
+
+
+
+## Dry runs
+
+A useful application of process parameter is a "dry run switch" for doing a quick version of the 
+pipeline to help quickly debugging. 
+
+Here is an example below. Notice that we pass the dry run option to `crossProduct()`; 
+instead of emitting all values in the cross product, it will only emit one:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/dry_run.nf
+```
+
+To run it in dry run model:
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/dry_run.nf -profile cluster --dryRun
+```
+
+
+## What to commit?
+
+Standard git guidelines suggest to never commit "derived files".
+We recommend to deviate slightly from git conventions and commit a bit more than just strict minimum:
+
+- `Manifest.toml` is derived from `Project.toml`, but commit it, as it contains
+    precise version information needed for reproducibility (in contrast to package developers, 
+    who would only commit `Project.toml`, but numerical experiments is not the same as a package!)
+- Once there are experiments you plan to include in a paper, commit the corresponding sub-folder 
+    of `deliverables`, **including the CSV files used to produce that figure**. This way the tex repo 
+    can just use the experiment repo as a submodule and the authors can compile the paper right away.
+    Having the CSV there also mean that plot esthetics can be quickly tweaked later on (e.g., the 
+    night before a talk). 
+
+
+## Updating code 
+
+Numerical experiment are often based on code you are developing along the way. When the code 
+is updated, with a bit of organization, nextflow can figure out which subset of the workflow needs to be re-run. 
+We present two models for doing this: one for lightweight code such as plotting/analysis, and one for 
+more substantial code, e.g. a method you are developing. 
+
+
+### Lightweight code
+
+Include the `.jl` file in the nextflow repo, feed it to the node as input, and use a 
+Julia `include()` on it. We have already used that pattern for the `plot` node in [an earlier example](07_combine.qmd). 
+
+If you have several Julia files, put them in a directory, and use the syntax:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/includes.nf
+```
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/includes.nf 
+```
+
+::: {.callout-warning}
+Passing a directory as input (rather than a collection of files as done above), 
+is not ideal in this context. This is because nextflow does not currently recurse inside 
+the directory to compute the checksum used to determine if the cache can be used. 
+Recall that in unix, the change date of a directory only changes when a file is deleted or 
+added under it, *and not when a file under it is edited!*
+:::
+
+
+### Library
+
+If the code you include is more complex, and/or might be used outside of the context of 
+one nextflow script, it is better to package it. 
+
+In Julia, creating a package is very simple and it can be published right away and for 
+free on github: see [this tutorial](https://julialang.org/contribute/developing_package/). 
+
+For example, we wrote a small Julia package, [CombineCSV.jl](https://github.com/UBC-Stat-ML/CombineCSVs) 
+to perform the CSV combination in 
+[this earlier section](07_combine.qmd). 
+
+To add or update, you can use a script of that form:
+
+```julia
+ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0
+using Pkg 
+Pkg.activate("julia_env")
+Pkg.add(url = "https://github.com/UBC-Stat-ML/CombineCSVs")
+```
+
+where you would replace the URL by the git repo you are using. Note that `add` will also 
+update to the head of the main branch. 
+
+This updates the "Manifest.toml" file which in turns signal our "pkg.jl" `instantiate` utility 
+that it needs to be reran by nextflow:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/pkg.nf
+```

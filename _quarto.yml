@@ -2,6 +2,8 @@ project:
   type: website
   render:
     - "*.qmd"
+  resources: 
+    - "report.html"
 
 website:
   title: "nf-nest"
@@ -26,6 +28,8 @@ website:
         file: 08_containers.qmd
       - text: "GPU programming"
         file: 09_gpu.qmd
+      - text: "Misc"
+        file: 10_misc.qmd
 
 format:
   html:
