@@ -18,7 +18,7 @@ In the file `nextflow.config` provided in `nf-nest` we
 provide an example of container documentation:
 
 ```{bash}
-head -n 26 experiment_repo/nextflow.config
+head -n 28 experiment_repo/nextflow.config
 ```
 
 There are two profiles, the `default` one using Docker, and the 
@@ -26,7 +26,7 @@ There are two profiles, the `default` one using Docker, and the
 container, which we call here `containerized`. 
 
 To instruct one of the process in the workflow to use that 
-container, add the directive `label 'containerized'. 
+container, add the directive `label 'containerized'`. 
 
 Here is an example of a process to compile and run a [Stan program](https://mc-stan.org/), 
 where Stan is part of the above container:

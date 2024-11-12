@@ -24,6 +24,8 @@ website:
         file: 07_combine.qmd
       - text: "Containers"
         file: 08_containers.qmd
+      - text: "GPU programming"
+        file: 09_gpu.qmd
 
 format:
   html:

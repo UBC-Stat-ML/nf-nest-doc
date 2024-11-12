@@ -1,0 +1,49 @@
+---
+title: "GPU programming"
+engine: knitr
+---
+
+## Installing CUDA.jl
+
+In a context such as Sockeye where it is not possible to access GPU nodes with 
+internet access, precompilation becomes more complicated than 
+[the earlier page on non-CUDA precompilation](05_pkg_cache.qmd). 
+
+We provide a workaround, `pkg_gpu.nf`, which offers the same functionality 
+as `pkg.nf` but is slower since all precompilation has to occur on the login 
+node.
+
+First, add the package as before:
+
+```{julia output = F}
+ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0 # Hold off precompile since we are in login node
+using Pkg 
+Pkg.activate("experiment_repo/julia_env")
+Pkg.add("CUDA")
+```
+
+Next, use the GPU precompilation script:
+
+```{bash}
+cd experiment_repo 
+./nextflow run nf-nest/pkg_gpu.nf 
+```
+
+
+## Running nextflow processes requiring GPU
+
+An example of a workflow using GPUs:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/gpu.nf
+```
+
+We run it using the same command as usual:
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/gpu.nf -profile cluster
+```
+
+
