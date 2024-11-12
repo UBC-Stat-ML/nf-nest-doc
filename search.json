@@ -50,6 +50,16 @@
     ]
   },
   {
+    "objectID": "10_misc.html#report",
+    "href": "10_misc.html#report",
+    "title": "Misc",
+    "section": "Report",
+    "text": "Report\nFollowing the nextflow documentation, we have set nextflow.config so that report.html, timeline.html and dag.html are automatically created.\nTo preview them in VS Code, add a VS Code Extension allowing html preview, for example Live Server. Then right click on the html file and select Show Preview.",
+    "crumbs": [
+      "Misc"
+    ]
+  },
+  {
     "objectID": "08_containers.html",
     "href": "08_containers.html",
     "title": "Containers",
@@ -294,7 +304,7 @@
     "href": "01_intro.html#background",
     "title": "Intro",
     "section": "Background",
-    "text": "Background\n\nScientific workflow\nA scientific workflow is a directed acyclic graph where each node is a process and each edge between node \\(n\\) to \\(n'\\) denote that at least one output of process \\(n\\) is fed as an input to process \\(n'\\).\nHere is an example from a workflow covered later in this tutorial:\n\n\n\n\n\nflowchart TB\n    subgraph \" \"\n    v0[\"julia_env\"]\n    v1[\"toml\"]\n    v4[\"Channel.fromList\"]\n    v7[\"julia_env\"]\n    v8[\"toml\"]\n    v12[\"plot_script\"]\n    end\n    v2([instantiate_process])\n    v3([precompile])\n    v5([run_julia])\n    subgraph combine_workflow\n    v9([instantiate_process])\n    v10([precompile])\n    v11([combine_process])\n    end\n    v13([plot])\n    subgraph \" \"\n    v14[\"combined_csvs_folder\"]\n    v15[\" \"]\n    end\n    v6(( ))\n    v0 --&gt; v2\n    v1 --&gt; v2\n    v2 --&gt; v3\n    v3 --&gt; v5\n    v3 --&gt; v13\n    v4 --&gt; v5\n    v5 --&gt; v6\n    v7 --&gt; v9\n    v8 --&gt; v9\n    v9 --&gt; v10\n    v10 --&gt; v11\n    v6 --&gt; v11\n    v11 --&gt; v13\n    v12 --&gt; v13\n    v13 --&gt; v15\n    v13 --&gt; v14",
+    "text": "Background\n\nScientific workflow\nA scientific workflow is a directed acyclic graph where each node is a process and each edge between node \\(n\\) to \\(n'\\) denote that at least one output of process \\(n\\) is fed as an input to process \\(n'\\).\nHere is an example from a workflow covered later in this tutorial:\n\n\n\n\n\nflowchart TB\n    subgraph \" \"\n    v0[\"julia_env\"]\n    v1[\"toml\"]\n    v4[\"Channel.fromList\"]\n    v7[\"julia_env\"]\n    v8[\"toml\"]\n    v12[\"plot_script\"]\n    end\n    v2([instantiate_process])\n    v3([precompile])\n    v5([run_julia])\n    subgraph combine_workflow\n    v9([instantiate_process])\n    v10([precompile])\n    v11([combine_process])\n    end\n    v13([plot])\n    subgraph \" \"\n    v14[\"combined_csvs_folder\"]\n    v15[\" \"]\n    end\n    v6(( ))\n    v0 --&gt; v2\n    v1 --&gt; v2\n    v2 --&gt; v3\n    v3 --&gt; v5\n    v3 --&gt; v13\n    v4 --&gt; v5\n    v5 --&gt; v6\n    v7 --&gt; v9\n    v8 --&gt; v9\n    v9 --&gt; v10\n    v10 --&gt; v11\n    v6 --&gt; v11\n    v11 --&gt; v13\n    v12 --&gt; v13\n    v13 --&gt; v15\n    v13 --&gt; v14\n\n\n\n\n\n\nIn a nutshell, nextflow will submit one or several SLURM job for each node in this graph, gather results, and produce some nice reports.",
     "crumbs": [
       "Introduction"
     ]
