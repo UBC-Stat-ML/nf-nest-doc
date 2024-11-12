@@ -1,0 +1,59 @@
+---
+title: "Containers"
+engine: knitr
+---
+
+
+## Overview
+
+Containers such as Docker and apptainer address two issues:
+
+- making pipeline reproducible,
+- we do not have root access in HPC. 
+
+
+## Using an existing container
+
+In the file `nextflow.config` provided in `nf-nest` we 
+provide an example of container documentation:
+
+```{bash}
+head -n 26 experiment_repo/nextflow.config
+```
+
+There are two profiles, the `default` one using Docker, and the 
+`cluster` one, using `apptainer`. We define a label for this 
+container, which we call here `containerized`. 
+
+To instruct one of the process in the workflow to use that 
+container, add the directive `label 'containerized'. 
+
+Here is an example of a process to compile and run a [Stan program](https://mc-stan.org/), 
+where Stan is part of the above container:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/stan.nf
+```
+
+Here is an example workflow using these containerized processes:
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/stan_example.nf
+```
+
+To run it:
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/stan_example.nf -profile cluster
+```
+
+
+## Creating containers
+
+There are many reference online for creating containers in general, but much less on 
+creating cross-platform containers working on both x86 and Apple Silicon. 
+
+We have created some script to help doing this, see [code and instructions at this page](https://github.com/UBC-Stat-ML/containers).

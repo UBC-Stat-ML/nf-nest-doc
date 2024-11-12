@@ -22,6 +22,8 @@ website:
         file: 06_cross_product.qmd
       - text: "Combine outputs"
         file: 07_combine.qmd
+      - text: "Containers"
+        file: 08_containers.qmd
 
 format:
   html:
