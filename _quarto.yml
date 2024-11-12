@@ -4,6 +4,8 @@ project:
     - "*.qmd"
   resources: 
     - "report.html"
+    - "timeline.html"
+    - "dag.html"
 
 website:
   title: "nf-nest"

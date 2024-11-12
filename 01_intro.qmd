@@ -88,6 +88,9 @@ flowchart TB
     v13 --> v14
 ```
 
+In a nutshell, nextflow will submit one or several SLURM job for 
+each node in this graph, gather results, and produce some [nice](report.html) [reports](timeline.html). 
+
 ## More information
 
 Both nextflow and Julia have excellent and extensive documentation. 

@@ -139,3 +139,10 @@ that it needs to be reran by nextflow:
 #| eval: false
 #| file: experiment_repo/nf-nest/pkg.nf
 ```
+
+
+## Report
+
+Following the [nextflow documentation](https://www.nextflow.io/docs/latest/reports.html), 
+we have set `nextflow.config` so that [`report.html`](report.html),  [`timeline.html`](timeline.html)
+and [`dag.html`](dag.html) are automatically created. 
