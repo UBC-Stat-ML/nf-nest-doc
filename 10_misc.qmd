@@ -146,3 +146,6 @@ that it needs to be reran by nextflow:
 Following the [nextflow documentation](https://www.nextflow.io/docs/latest/reports.html), 
 we have set `nextflow.config` so that [`report.html`](report.html),  [`timeline.html`](timeline.html)
 and [`dag.html`](dag.html) are automatically created. 
+
+To preview them in VS Code, add a VS Code Extension allowing html preview, for example `Live Server`. 
+Then right click on the html file and select `Show Preview`.  
