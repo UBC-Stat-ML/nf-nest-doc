@@ -66,6 +66,10 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -176,6 +180,12 @@ window.Quarto = {
  <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_containers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Containers</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -187,14 +197,13 @@ window.Quarto = {
    
   <ul>
   <li><a href="#context" id="toc-context" class="nav-link active" data-scroll-target="#context">Context</a></li>
-  <li><a href="#goal" id="toc-goal" class="nav-link" data-scroll-target="#goal">Goal</a></li>
+  <li><a href="#nf-nest" id="toc-nf-nest" class="nav-link" data-scroll-target="#nf-nest"><code>nf-nest</code></a></li>
   <li><a href="#technology-stack" id="toc-technology-stack" class="nav-link" data-scroll-target="#technology-stack">Technology stack</a></li>
   <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a>
   <ul class="collapse">
   <li><a href="#scientific-workflow" id="toc-scientific-workflow" class="nav-link" data-scroll-target="#scientific-workflow">Scientific workflow</a></li>
-  <li><a href="#nextflow" id="toc-nextflow" class="nav-link" data-scroll-target="#nextflow">Nextflow</a></li>
-  <li><a href="#julia" id="toc-julia" class="nav-link" data-scroll-target="#julia">Julia</a></li>
   </ul></li>
+  <li><a href="#more-information" id="toc-more-information" class="nav-link" data-scroll-target="#more-information">More information</a></li>
   </ul>
 </nav>
     </div>
@@ -222,11 +231,21 @@ window.Quarto = {
 
 <section id="context" class="level2">
 <h2 class="anchored" data-anchor-id="context">Context</h2>
-<p>Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy.</p>
+<p>Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. It is crucial to have good tools to coordinate and organize these experiments.</p>
 </section>
-<section id="goal" class="level2">
-<h2 class="anchored" data-anchor-id="goal">Goal</h2>
-<p>This repository documents <code>nf-nest</code> a suite of utilities to help you succeed in your numerical experimental campaigns.</p>
+<section id="nf-nest" class="level2">
+<h2 class="anchored" data-anchor-id="nf-nest"><code>nf-nest</code></h2>
+<p>This webpage documents <code>nf-nest</code>, a collection of small but powerful utilities built on nextflow to help accomplish this.</p>
+<p>Aspects taken into account:</p>
+<ul>
+<li>Automating cross-product of input parameters in experiments.</li>
+<li>Automating creation of submission scripts and ordering of jobs (taking care of moving across file system, dynamic memory requirements, etc).</li>
+<li>Automating the gathering of results from many runs.</li>
+<li>Caching already ran jobs.</li>
+<li>Robustness to failure.</li>
+<li>Reproducibility via apptainer and docker, supporting both x86 and apple silicon.</li>
+<li>Support for GPU programming.</li>
+</ul>
 </section>
 <section id="technology-stack" class="level2">
 <h2 class="anchored" data-anchor-id="technology-stack">Technology stack</h2>
@@ -242,19 +261,68 @@ window.Quarto = {
 <section id="scientific-workflow" class="level3">
 <h3 class="anchored" data-anchor-id="scientific-workflow">Scientific workflow</h3>
 <p>A scientific workflow is a directed acyclic graph where each node is a process and each edge between node <span class="math inline">\(n\)</span> to <span class="math inline">\(n'\)</span> denote that at least one output of process <span class="math inline">\(n\)</span> is fed as an input to process <span class="math inline">\(n'\)</span>.</p>
-<p>TODO: prototype example (preprocess / precompile / run array of exeriments / combine / plot) / figure</p>
-<p>TODO: mention benefits - job submission of each node at right time, file system issues, retries, repro, etc</p>
+<p>Here is an example from <a href="./07_combine.html">a workflow covered later in this tutorial</a>:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TB
+    subgraph " "
+    v0["julia_env"]
+    v1["toml"]
+    v4["Channel.fromList"]
+    v7["julia_env"]
+    v8["toml"]
+    v12["plot_script"]
+    end
+    v2([instantiate_process])
+    v3([precompile])
+    v5([run_julia])
+    subgraph combine_workflow
+    v9([instantiate_process])
+    v10([precompile])
+    v11([combine_process])
+    end
+    v13([plot])
+    subgraph " "
+    v14["combined_csvs_folder"]
+    v15[" "]
+    end
+    v6(( ))
+    v0 --&gt; v2
+    v1 --&gt; v2
+    v2 --&gt; v3
+    v3 --&gt; v5
+    v3 --&gt; v13
+    v4 --&gt; v5
+    v5 --&gt; v6
+    v7 --&gt; v9
+    v8 --&gt; v9
+    v9 --&gt; v10
+    v10 --&gt; v11
+    v6 --&gt; v11
+    v11 --&gt; v13
+    v12 --&gt; v13
+    v13 --&gt; v15
+    v13 --&gt; v14
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 </section>
-<section id="nextflow" class="level3">
-<h3 class="anchored" data-anchor-id="nextflow">Nextflow</h3>
-<p>TODO: pointer to doc, etc.</p>
 </section>
-<section id="julia" class="level3">
-<h3 class="anchored" data-anchor-id="julia">Julia</h3>
-<p>TODO: pointer to doc</p>
+<section id="more-information" class="level2">
+<h2 class="anchored" data-anchor-id="more-information">More information</h2>
+<p>Both nextflow and Julia have excellent and extensive documentation.</p>
+<ul>
+<li><a href="https://www.nextflow.io/docs/latest/overview.html">Nexflow documentation</a></li>
+<li><a href="https://docs.julialang.org/en/v1/">Julia documentation</a></li>
+</ul>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

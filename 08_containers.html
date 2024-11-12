@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Creating an experiment repo – nf-nest</title>
+<title>Containers – nf-nest</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -114,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03_create-exp-repo.html">Create an experiment repo</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./08_containers.html">Containers</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -153,7 +153,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./03_create-exp-repo.html" class="sidebar-item-text sidebar-link active">
+  <a href="./03_create-exp-repo.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Create an experiment repo</span></a>
   </div>
 </li>
@@ -183,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./08_containers.html" class="sidebar-item-text sidebar-link">
+  <a href="./08_containers.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Containers</span></a>
   </div>
 </li>
@@ -198,8 +198,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#location" id="toc-location" class="nav-link" data-scroll-target="#location">Location</a></li>
-  <li><a href="#sec-instructions" id="toc-sec-instructions" class="nav-link" data-scroll-target="#sec-instructions">Instructions</a></li>
+  <li><a href="#using-an-existing-container" id="toc-using-an-existing-container" class="nav-link" data-scroll-target="#using-an-existing-container">Using an existing container</a></li>
+  <li><a href="#creating-containers" id="toc-creating-containers" class="nav-link" data-scroll-target="#creating-containers">Creating containers</a></li>
   </ul>
 </nav>
     </div>
@@ -208,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Creating an experiment repo</h1>
+<h1 class="title">Containers</h1>
 </div>
 
 
@@ -227,41 +227,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.</p>
-<p>It consists in a git repository with:</p>
+<p>Containers such as Docker and apptainer address two issues:</p>
 <ul>
-<li>the <code>nextflow</code> executable and its configuration, <code>nextflow.config</code>;</li>
-<li>a git submodule, <code>nf-nest</code> containing useful tools;</li>
-<li>your <code>.nf</code> files and other supporting files.</li>
+<li>making pipeline reproducible,</li>
+<li>we do not have root access in HPC.</li>
 </ul>
-<p>This pages explains how to setup an experiment repo.</p>
 </section>
-<section id="location" class="level2">
-<h2 class="anchored" data-anchor-id="location">Location</h2>
-<p>In an HPC context, the experiment repo should be in a read/write location accessible to all nodes.</p>
-<p>For example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e.&nbsp;cd to a path of the form</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JULIA_DEPOT_PATH</span><span class="op">=</span>/arc/burst/<span class="pp">[</span><span class="ss">allocation_code</span><span class="pp">]</span>/<span class="pp">[</span><span class="ss">username_in_alloc</span><span class="pp">]</span>/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>A second choice would be to use the scratch space, i.e.&nbsp;cd to a path of the form</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JULIA_DEPOT_PATH</span><span class="op">=</span>/scratch/<span class="pp">[</span><span class="ss">allocation_code</span><span class="pp">]</span>/<span class="pp">[</span><span class="ss">username_in_alloc</span><span class="pp">]</span>/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="sec-instructions" class="level2">
-<h2 class="anchored" data-anchor-id="sec-instructions">Instructions</h2>
-<p>For quick setup, run the following commands:</p>
+<section id="using-an-existing-container" class="level2">
+<h2 class="anchored" data-anchor-id="using-an-existing-container">Using an existing container</h2>
+<p>In the file <code>nextflow.config</code> provided in <code>nf-nest</code> we provide an example of container documentation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a directory and cd into it</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> experiment_repo <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> <span class="va">$_</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># setup nextflow</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> https://get.nextflow.io <span class="kw">|</span> <span class="fu">bash</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># add nf-nest utilities</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule add https://github.com/UBC-Stat-ML/nf-nest.git</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># copy template for nextflow configurations</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> nf-nest/nextflow.config .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> <span class="at">-n</span> 26 experiment_repo/nextflow.config</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>profiles {
+    standard {  
+        docker.enabled = true
+        process {
+            withLabel:containerized {
+                container = 'alexandrebouchardcote/default:0.1.6'
+            }
+        }
+    }
+    cluster {
+        apptainer.enabled = true
+        process {
+            scratch = true
+            executor = 'slurm'
+            cpus = 1
+            memory = 4.GB
+            time = '2h'
+            clusterOptions = "--nodes=1 --account $ALLOCATION_CODE"
+
+            withLabel:containerized {
+                container = 'alexandrebouchardcote/default:0.1.6'
+                module = 'apptainer'
+            }
+        }
+    }
+}</code></pre>
 </div>
+</div>
+<p>There are two profiles, the <code>default</code> one using Docker, and the <code>cluster</code> one, using <code>apptainer</code>. We define a label for this container, which we call here <code>containerized</code>.</p>
+<p>To instruct one of the process in the workflow to use that container, add the directive <code>label 'containerized'</code>.</p>
+<p>Here is an example of a process to compile and run a <a href="https://mc-stan.org/">Stan program</a>, where Stan is part of the above container:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>process compile_stan <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    label <span class="st">'containerized'</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        path stan_file</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        path <span class="st">"</span><span class="ss">${</span>stan_file<span class="op">.</span>baseName<span class="ss">}</span><span class="st">"</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">    # name of stan file without extension</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">    base_name=`basename </span><span class="ss">$stan_file</span><span class="st"> .stan`</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="st">    # need to run Stan's make file from the CMDSTAN dir</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">    CUR=`pwd`</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">    cd </span><span class="er">\$</span><span class="st">CMDSTAN</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">    make </span><span class="er">\$</span><span class="st">CUR/</span><span class="er">\$</span><span class="st">base_name</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>process run_stan <span class="op">{</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    label <span class="st">'containerized'</span> </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        path stan_exec </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        path data</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="st">    ./</span><span class="ss">$stan_exec</span><span class="st"> sample </span><span class="er">\</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="st">        data file=</span><span class="ss">$data</span><span class="st"> </span><span class="er">\</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="st">        output file=samples.csv </span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="st">    # Compute ESS from Stan's stansummary utility</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="er">\$</span><span class="st">CMDSTAN/bin/stansummary samples.csv --csv_filename ess.csv</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here is an example workflow using these containerized processes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> compile_stan<span class="op">;</span> run_stan<span class="op">;</span> <span class="op">}</span> from <span class="st">"./stan.nf"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> stanModel <span class="op">=</span> <span class="fu">file</span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.stan"</span><span class="op">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> data <span class="op">=</span> <span class="fu">file</span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.data.json"</span><span class="op">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    compiled <span class="op">=</span> <span class="fu">compile_stan</span><span class="op">(</span>stanModel<span class="op">)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">run_stan</span><span class="op">(</span>compiled<span class="op">,</span> data<span class="op">)</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To run it:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/stan_example.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>N E X T F L O W  ~  version 24.10.0
+Launching `nf-nest/examples/stan_example.nf` [evil_euclid] DSL2 - revision: 8cef9f29d6
+WARN: Apptainer cache directory has not been defined -- Remote image will be stored in the path: /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity -- Use the environment variable NXF_APPTAINER_CACHEDIR to specify a different location
+Pulling Apptainer image docker://alexandrebouchardcote/default:0.1.6 [cache /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity/alexandrebouchardcote-default-0.1.6.img]
+[7a/1613d3] Submitted process &gt; compile_stan
+[32/fc72f4] Submitted process &gt; run_stan</code></pre>
+</div>
+</div>
+</section>
+<section id="creating-containers" class="level2">
+<h2 class="anchored" data-anchor-id="creating-containers">Creating containers</h2>
+<p>There are many reference online for creating containers in general, but much less on creating cross-platform containers working on both x86 and Apple Silicon.</p>
+<p>We have created some script to help doing this, see <a href="https://github.com/UBC-Stat-ML/containers">code and instructions at this page</a>.</p>
 
 
 </section>

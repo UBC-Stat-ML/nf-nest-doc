@@ -181,6 +181,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Combine outputs</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_containers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Containers</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -323,33 +329,33 @@ put csv files.</p>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/full.nf` [distraught_mercator] DSL2 - revision: a68c131baa
-[83/3aeed4] Cached process &gt; combine_workflow:instantiate_process
-[e3/1f4424] Cached process &gt; instantiate_process
-[c0/0ec986] Cached process &gt; precompile
-[98/386e37] Cached process &gt; combine_workflow:precompile
-[10/2bbd71] Cached process &gt; run_julia (5)
-[e6/0b1ec1] Cached process &gt; run_julia (11)
-[33/4ad6aa] Cached process &gt; run_julia (7)
-[d5/6a60e0] Cached process &gt; run_julia (4)
-[2d/99c01f] Cached process &gt; run_julia (12)
-[2f/397824] Cached process &gt; run_julia (15)
-[d7/a4d24c] Cached process &gt; run_julia (1)
-[4c/ae1bf0] Cached process &gt; run_julia (3)
-[f6/e22d72] Cached process &gt; run_julia (8)
-[4f/1aad96] Cached process &gt; run_julia (9)
-[b5/c464a8] Cached process &gt; run_julia (14)
-[34/8b2f37] Cached process &gt; run_julia (13)
-[37/f3e661] Cached process &gt; run_julia (16)
-[91/3d28f2] Cached process &gt; run_julia (17)
-[9e/8e7aac] Cached process &gt; run_julia (2)
-[c7/e3e10e] Cached process &gt; run_julia (19)
-[a8/aaa2ad] Cached process &gt; run_julia (6)
-[6c/a9a22e] Cached process &gt; run_julia (18)
-[ee/e2c832] Cached process &gt; run_julia (20)
-[d0/b1d8a8] Cached process &gt; run_julia (10)
-[fd/4bd721] Cached process &gt; combine_workflow:combine_process
-[02/c1b3d0] Submitted process &gt; plot</code></pre>
+Launching `nf-nest/examples/full.nf` [small_boltzmann] DSL2 - revision: a68c131baa
+[60/5b521f] Submitted process &gt; combine_workflow:instantiate_process
+[90/a3c5c4] Submitted process &gt; instantiate_process
+[f1/05f47e] Submitted process &gt; combine_workflow:precompile
+[31/1641f3] Submitted process &gt; precompile
+[85/3ab69c] Submitted process &gt; run_julia (11)
+[b3/421a4c] Submitted process &gt; run_julia (12)
+[ae/9af39b] Submitted process &gt; run_julia (15)
+[86/6a90e3] Submitted process &gt; run_julia (10)
+[f4/b1ad3b] Submitted process &gt; run_julia (4)
+[cf/eb486e] Submitted process &gt; run_julia (16)
+[ed/285ac0] Submitted process &gt; run_julia (8)
+[2c/f61efc] Submitted process &gt; run_julia (9)
+[db/729172] Submitted process &gt; run_julia (5)
+[94/f1828a] Submitted process &gt; run_julia (7)
+[2c/b1dad1] Submitted process &gt; run_julia (19)
+[e1/c153b0] Submitted process &gt; run_julia (3)
+[1c/1f6ead] Submitted process &gt; run_julia (2)
+[0b/572356] Submitted process &gt; run_julia (13)
+[56/614911] Submitted process &gt; run_julia (1)
+[8e/c15bbb] Submitted process &gt; run_julia (6)
+[35/60620a] Submitted process &gt; run_julia (14)
+[b1/80011d] Submitted process &gt; run_julia (18)
+[33/1c1c96] Submitted process &gt; run_julia (17)
+[8b/e192e5] Submitted process &gt; run_julia (20)
+[c2/4decb3] Submitted process &gt; combine_workflow:combine_process
+[95/035fbb] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 </section>
@@ -370,7 +376,7 @@ Launching `nf-nest/examples/full.nf` [distraught_mercator] DSL2 - revision: a68c
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>experiment_repo/deliverables
-└── scriptName=full.nf___runName=distraught_mercator
+└── scriptName=full.nf___runName=small_boltzmann
     ├── output
     │&nbsp;&nbsp; ├── summary.csv
     │&nbsp;&nbsp; └── swap_prs.csv
@@ -384,12 +390,11 @@ Launching `nf-nest/examples/full.nf` [distraught_mercator] DSL2 - revision: a68c
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                
-2024-11-10 21:25:52 1.3s        sharp_gautier       OK      9d1a692a7e  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/hello.nf                 
-2024-11-10 21:25:56 6.5s        angry_gautier       OK      9d1a692a7e  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/hello.nf -profile cluster
-2024-11-10 21:26:53 1m 12s      clever_aryabhata    OK      869ec1e084  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/pkg.nf -profile cluster           
-2024-11-10 21:40:58 3m 28s      nostalgic_celsius   ERR     a68c131baa  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/full.nf -profile cluster 
-2024-11-10 21:44:42 42.5s       distraught_mercator OK      a68c131baa  c796b3dd-c4da-4550-898b-8c6bcb46fc75    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
+<pre><code>TIMESTAMP           DURATION    RUN NAME                STATUS  REVISION ID SESSION ID                              COMMAND                                                
+2024-11-11 15:44:22 3s          furious_chandrasekhar   OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf                 
+2024-11-11 15:44:28 7.5s        boring_wegener          OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf -profile cluster
+2024-11-11 15:45:26 47.7s       ridiculous_kimura       OK      869ec1e084  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/pkg.nf -profile cluster           
+2024-11-11 15:46:38 4m 9s       small_boltzmann         OK      a68c131baa  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
 </div>
 </div>
 

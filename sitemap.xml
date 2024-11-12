@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/07_combine.html</loc>
-    <lastmod>2024-11-11T06:09:35.688Z</lastmod>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/08_containers.html</loc>
+    <lastmod>2024-11-12T00:44:11.143Z</lastmod>
   </url>
   <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/04_launch.html</loc>
-    <lastmod>2024-11-11T20:59:33.981Z</lastmod>
-  </url>
-  <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/02_setup.html</loc>
-    <lastmod>2024-11-11T21:22:34.211Z</lastmod>
-  </url>
-  <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/01_intro.html</loc>
-    <lastmod>2024-11-11T03:51:10.632Z</lastmod>
-  </url>
-  <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/06_cross_product.html</loc>
-    <lastmod>2024-11-11T04:47:47.073Z</lastmod>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/05_pkg.html</loc>
+    <lastmod>2024-11-11T21:23:25.861Z</lastmod>
   </url>
   <url>
     <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/03_create-exp-repo.html</loc>
     <lastmod>2024-11-11T21:29:44.175Z</lastmod>
   </url>
   <url>
-    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/05_pkg.html</loc>
-    <lastmod>2024-11-11T21:23:25.861Z</lastmod>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/06_cross_product.html</loc>
+    <lastmod>2024-11-11T04:47:47.073Z</lastmod>
+  </url>
+  <url>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/09_gpu.html</loc>
+    <lastmod>2024-11-12T00:46:16.415Z</lastmod>
+  </url>
+  <url>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/01_intro.html</loc>
+    <lastmod>2024-11-11T23:29:16.020Z</lastmod>
+  </url>
+  <url>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/02_setup.html</loc>
+    <lastmod>2024-11-11T21:22:34.211Z</lastmod>
+  </url>
+  <url>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/04_launch.html</loc>
+    <lastmod>2024-11-11T20:59:33.981Z</lastmod>
+  </url>
+  <url>
+    <loc>https://UBC-Stat-ML.github.io/nf-nest-doc/07_combine.html</loc>
+    <lastmod>2024-11-11T06:09:35.688Z</lastmod>
   </url>
 </urlset>
