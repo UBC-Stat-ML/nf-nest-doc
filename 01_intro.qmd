@@ -13,7 +13,7 @@ It is crucial to have good tools to coordinate and organize these experiments.
 ## `nf-nest`
 
 This webpage documents `nf-nest`, a collection of small but powerful utilities built on nextflow to
-help accomplish this.
+help accomplish this. [Link to github repository.](https://github.com/UBC-Stat-ML/nf-nest).
 
 Aspects taken into account:
 

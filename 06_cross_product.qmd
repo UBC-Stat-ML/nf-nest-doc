@@ -6,7 +6,7 @@ engine: knitr
 ## Overview 
 
 Suppose you are interested in running a piece of code with many 
-different outputs, with each execution performed on a different 
+different inputs, with each execution performed on a different 
 compute node of a cluster. 
 
 This page shows a streamlined way to do so. 
@@ -56,3 +56,22 @@ cd experiment_repo
 ./nextflow run nf-nest/examples/many_jobs.nf -profile cluster
 ```
 
+
+## Filtering
+
+In some case we want to run only a subset of the cross product. 
+For example, suppose we want only the runs of the form 
+`a * a` and `a + a`. This can be done using 
+[the `filter()` function in nextflow](https://www.nextflow.io/docs/latest/reference/operator.html#filter):
+
+```{groovy}
+#| eval: false
+#| file: experiment_repo/nf-nest/examples/filter.nf
+```
+
+Running this 
+
+```{bash}
+cd experiment_repo
+./nextflow run nf-nest/examples/filter.nf  
+```

@@ -86,14 +86,28 @@ associated with the directive in a sub-directory of
 `experiment_repo/deliverables`. 
 
 ```{bash}
-tree experiment_repo/deliverables
+cd experiment_repo
+tree deliverables
 ```
 
-Here the `runName` can be used with nextflow's 
+Here the contents of `runName.txt` can be used with nextflow's 
 [`log` command](https://www.nextflow.io/docs/latest/reports.html) 
 to obtain more information on the run.
 
-```{bash}
+```{bash echo = -1}
+cd experiment_repo
+cat deliverables/scriptName=full.nf/runName.txt 
+```
+
+```{bash echo = -1}
 cd experiment_repo
 ./nextflow log
+```
+
+And we can see in the CSV that indeed the columns `seed` and `n_chains` 
+were added to the left:
+
+```{bash echo = -1}
+cd experiment_repo
+head -n 2 deliverables/scriptName=full.nf/output/summary.csv 
 ```
