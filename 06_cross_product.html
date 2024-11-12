@@ -242,6 +242,7 @@ window.Quarto = {
   <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
   <li><a href="#nextflow-script" id="toc-nextflow-script" class="nav-link" data-scroll-target="#nextflow-script">Nextflow script</a></li>
   <li><a href="#running-the-script" id="toc-running-the-script" class="nav-link" data-scroll-target="#running-the-script">Running the script</a></li>
+  <li><a href="#filtering" id="toc-filtering" class="nav-link" data-scroll-target="#filtering">Filtering</a></li>
   </ul>
 </nav>
     </div>
@@ -269,7 +270,7 @@ window.Quarto = {
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.</p>
+<p>Suppose you are interested in running a piece of code with many different inputs, with each execution performed on a different compute node of a cluster.</p>
 <p>This page shows a streamlined way to do so.</p>
 </section>
 <section id="example" class="level2">
@@ -344,42 +345,98 @@ window.Quarto = {
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/many_jobs.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-WARN: It appears you have never run this project before -- Option `-resume` is ignored
-Launching `nf-nest/examples/many_jobs.nf` [pensive_cuvier] DSL2 - revision: aa082b1978
-[9a/f95c38] Submitted process &gt; run_julia (16)
-[31/c84da1] Submitted process &gt; run_julia (8)
-[70/882e38] Submitted process &gt; run_julia (7)
-[f8/827180] Submitted process &gt; run_julia (9)
-[40/502eb0] Submitted process &gt; run_julia (5)
-[24/235871] Submitted process &gt; run_julia (13)
-[08/c3250a] Submitted process &gt; run_julia (3)
-[2a/d590b5] Submitted process &gt; run_julia (11)
-[1a/18653d] Submitted process &gt; run_julia (6)
-[ba/2ffe85] Submitted process &gt; run_julia (2)
-[4f/48bab2] Submitted process &gt; run_julia (4)
-[55/fb4a96] Submitted process &gt; run_julia (14)
-[6b/ba0d04] Submitted process &gt; run_julia (15)
-[33/3c91f1] Submitted process &gt; run_julia (1)
-[67/d912ab] Submitted process &gt; run_julia (12)
-[42/edc64d] Submitted process &gt; run_julia (10)
-[d0/25bfed] Submitted process &gt; run_julia (18)
-[39/75210b] Submitted process &gt; run_julia (17)
-3 * 2 = 6
-2 + 2 = 4
+Launching `nf-nest/examples/many_jobs.nf` [elegant_fermi] DSL2 - revision: aa082b1978
+[4d/7492f2] Submitted process &gt; run_julia (7)
+[6c/41c384] Submitted process &gt; run_julia (6)
+[dd/7a5a36] Submitted process &gt; run_julia (14)
+[e8/b7de0b] Submitted process &gt; run_julia (9)
+[f0/6df027] Submitted process &gt; run_julia (1)
+[a3/ef9de9] Submitted process &gt; run_julia (4)
+[a3/f36c6f] Submitted process &gt; run_julia (2)
+[eb/83e088] Submitted process &gt; run_julia (16)
+[73/038281] Submitted process &gt; run_julia (3)
+[2c/689c09] Submitted process &gt; run_julia (15)
+[14/7503f2] Submitted process &gt; run_julia (8)
+[d8/14676b] Submitted process &gt; run_julia (10)
+[6e/7edb12] Submitted process &gt; run_julia (5)
+[ae/f4128b] Submitted process &gt; run_julia (13)
+[9c/092e9c] Submitted process &gt; run_julia (11)
+[60/531ea0] Submitted process &gt; run_julia (12)
+[d4/d42221] Submitted process &gt; run_julia (18)
+[0b/f6b1c6] Submitted process &gt; run_julia (17)
 2 + 1 = 3
-2 * 1 = 2
+1 * 3 = 3
+3 * 1 = 3
+2 + 2 = 4
+1 + 1 = 2
+1 * 2 = 2
+1 * 1 = 1
+3 * 2 = 6
+2 * 2 = 4
 1 + 3 = 4
 3 + 1 = 4
+3 * 3 = 9
+3 + 3 = 6
 1 + 2 = 3
-2 + 3 = 5
-1 * 3 = 3
-1 * 1 = 1
-1 * 2 = 2
-3 * 1 = 3
 3 + 2 = 5
-1 + 1 = 2
-2 * 3 = 6
+2 * 1 = 2
+2 + 3 = 5
+2 * 3 = 6</code></pre>
+</div>
+</div>
+</section>
+<section id="filtering" class="level2">
+<h2 class="anchored" data-anchor-id="filtering">Filtering</h2>
+<p>In some case we want to run only a subset of the cross product. For example, suppose we want only the runs of the form <code>a * a</code> and <code>a + a</code>. This can be done using <a href="https://www.nextflow.io/docs/latest/reference/operator.html#filter">the <code>filter()</code> function in nextflow</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// we use utilities in the nf-nest submodule</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">// in user scripts, path would be './nf-nest/cross.nf' </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> crossProduct<span class="op">;</span> filed<span class="op">;</span> deliverables <span class="op">}</span> from <span class="st">'../cross.nf'</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> instantiate<span class="op">;</span> precompile<span class="op">;</span> activate <span class="op">}</span> from <span class="st">'../pkg.nf'</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> variables <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    first<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    second<span class="op">:</span> <span class="fl">1..3</span><span class="op">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    operation<span class="op">:</span> <span class="op">[</span><span class="st">"+"</span><span class="op">,</span> <span class="st">"*"</span><span class="op">]</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">// specifies the order of operations</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    configs <span class="op">=</span> <span class="fu">crossProduct</span><span class="op">(</span>variables<span class="op">).</span><span class="fu">filter</span><span class="op">{</span> config <span class="op">-&gt;</span> config<span class="op">.</span>first <span class="op">==</span> config<span class="op">.</span>second <span class="op">}</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">run_julia</span><span class="op">(</span>configs<span class="op">)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// equivalent pipe syntax:</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// crossProduct(variables) | filter{ config -&gt; config.first == config.second } | run_julia</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    debug <span class="kw">true</span> <span class="co">// by default, standard out is not shown, use this to show it</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        val config </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">()</span><span class="ss">}</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="st">    @show </span><span class="ss">${</span>config<span class="op">.</span>first<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>operation<span class="ss">}</span><span class="st"> </span><span class="ss">${</span>config<span class="op">.</span>second<span class="ss">}</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Running this</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/filter.nf  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>N E X T F L O W  ~  version 24.10.0
+Launching `nf-nest/examples/filter.nf` [tiny_elion] DSL2 - revision: d9de661ecc
+[c0/6ac1a6] Submitted process &gt; run_julia (4)
+[b5/180362] Submitted process &gt; run_julia (1)
+[e9/7403a5] Submitted process &gt; run_julia (3)
+[30/748169] Submitted process &gt; run_julia (6)
+[52/c579d6] Submitted process &gt; run_julia (2)
+[c1/141e36] Submitted process &gt; run_julia (5)
 2 * 2 = 4
+2 + 2 = 4
+1 * 1 = 1
+1 + 1 = 2
 3 * 3 = 9
 3 + 3 = 6</code></pre>
 </div>

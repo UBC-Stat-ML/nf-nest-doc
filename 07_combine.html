@@ -341,33 +341,33 @@ put csv files.</p>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/full.nf` [intergalactic_jepsen] DSL2 - revision: a68c131baa
-[9c/0659ed] Submitted process &gt; combine_workflow:instantiate_process
-[71/d2fadf] Submitted process &gt; instantiate_process
-[ce/f1a696] Submitted process &gt; combine_workflow:precompile
-[4d/72b110] Submitted process &gt; precompile
-[42/0732cc] Submitted process &gt; run_julia (9)
-[5e/81171f] Submitted process &gt; run_julia (1)
-[c5/1ccbfe] Submitted process &gt; run_julia (3)
-[d4/228929] Submitted process &gt; run_julia (4)
-[2b/2baf59] Submitted process &gt; run_julia (14)
-[8c/2bb063] Submitted process &gt; run_julia (15)
-[d5/5001bb] Submitted process &gt; run_julia (13)
-[56/de7ec7] Submitted process &gt; run_julia (7)
-[ab/d18893] Submitted process &gt; run_julia (11)
-[76/fc81a9] Submitted process &gt; run_julia (5)
-[69/6f13e4] Submitted process &gt; run_julia (10)
-[28/fa731e] Submitted process &gt; run_julia (2)
-[61/f7b16b] Submitted process &gt; run_julia (12)
-[8e/3df7d5] Submitted process &gt; run_julia (16)
-[d3/fe1273] Submitted process &gt; run_julia (6)
-[56/f5fc6a] Submitted process &gt; run_julia (8)
-[ee/683820] Submitted process &gt; run_julia (17)
-[58/7fa150] Submitted process &gt; run_julia (18)
-[28/2a8382] Submitted process &gt; run_julia (19)
-[c2/f5b56b] Submitted process &gt; run_julia (20)
-[52/031bf9] Submitted process &gt; combine_workflow:combine_process
-[c0/9912ef] Submitted process &gt; plot</code></pre>
+Launching `nf-nest/examples/full.nf` [golden_poitras] DSL2 - revision: a68c131baa
+[8c/a117a8] Submitted process &gt; instantiate_process
+[5f/997727] Submitted process &gt; combine_workflow:instantiate_process
+[72/cc3bb2] Submitted process &gt; precompile
+[b9/57c5b2] Submitted process &gt; combine_workflow:precompile
+[42/f159a5] Submitted process &gt; run_julia (13)
+[bc/98503a] Submitted process &gt; run_julia (10)
+[4d/bd3f1f] Submitted process &gt; run_julia (1)
+[c6/c5473f] Submitted process &gt; run_julia (7)
+[9c/4051ca] Submitted process &gt; run_julia (5)
+[c1/2cb9ec] Submitted process &gt; run_julia (11)
+[6d/af7d1f] Submitted process &gt; run_julia (16)
+[a2/78b5dc] Submitted process &gt; run_julia (8)
+[47/65c526] Submitted process &gt; run_julia (14)
+[9b/e1998e] Submitted process &gt; run_julia (12)
+[65/c7c28f] Submitted process &gt; run_julia (6)
+[07/9f3d4c] Submitted process &gt; run_julia (2)
+[13/27eb7d] Submitted process &gt; run_julia (3)
+[95/88b5e1] Submitted process &gt; run_julia (9)
+[33/81cb06] Submitted process &gt; run_julia (19)
+[e4/7dc064] Submitted process &gt; run_julia (17)
+[50/cb53b6] Submitted process &gt; run_julia (4)
+[44/c2c487] Submitted process &gt; run_julia (15)
+[b9/05c738] Submitted process &gt; run_julia (20)
+[c9/0e2573] Submitted process &gt; run_julia (18)
+[cf/4b324f] Submitted process &gt; combine_workflow:combine_process
+[ff/ab4541] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 </section>
@@ -385,28 +385,48 @@ Launching `nf-nest/examples/full.nf` [intergalactic_jepsen] DSL2 - revision: a68
 <h3 class="anchored" data-anchor-id="organizing-the-output-with-a-publishdir">Organizing the output with a publishDir</h3>
 <p>A better approach is to use the <code>publishDir</code> directive, combined with <code>nf-nest</code>’s <code>deliverables()</code> utility, as illustrated in the <code>run_julia</code> process above. This will automatically copy the output of the process associated with the directive in a sub-directory of <code>experiment_repo/deliverables</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>experiment_repo/deliverables
-└── scriptName=full.nf___runName=intergalactic_jepsen
+<pre><code>deliverables
+└── scriptName=full.nf
     ├── output
     │&nbsp;&nbsp; ├── summary.csv
     │&nbsp;&nbsp; └── swap_prs.csv
-    └── plot.png
+    ├── plot.png
+    └── runName.txt
 
-2 directories, 3 files</code></pre>
+2 directories, 4 files</code></pre>
 </div>
 </div>
-<p>Here the <code>runName</code> can be used with nextflow’s <a href="https://www.nextflow.io/docs/latest/reports.html"><code>log</code> command</a> to obtain more information on the run.</p>
+<p>Here the contents of <code>runName.txt</code> can be used with nextflow’s <a href="https://www.nextflow.io/docs/latest/reports.html"><code>log</code> command</a> to obtain more information on the run.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> deliverables/scriptName=full.nf/runName.txt </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TIMESTAMP           DURATION    RUN NAME                STATUS  REVISION ID SESSION ID                              COMMAND                                                
-2024-11-12 09:04:09 3.5s        grave_allen             OK      9d1a692a7e  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/hello.nf                 
-2024-11-12 09:04:16 6.9s        romantic_solvay         OK      9d1a692a7e  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/hello.nf -profile cluster
-2024-11-12 09:05:11 1m 13s      golden_shaw             OK      fc0374e695  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/pkg.nf -profile cluster           
-2024-11-12 09:06:48 3m 8s       intergalactic_jepsen    OK      a68c131baa  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
+<pre><code>golden_poitras</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                       
+2024-11-12 12:05:21 5.8s        angry_northcutt     OK      9d1a692a7e  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/hello.nf                        
+2024-11-12 12:05:33 8.6s        wise_goldberg       OK      9d1a692a7e  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/hello.nf -profile cluster       
+2024-11-12 12:06:36 1m 20s      ridiculous_volta    OK      fc0374e695  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/pkg.nf -profile cluster                  
+2024-11-12 12:08:22 1m 39s      elegant_fermi       OK      aa082b1978  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/many_jobs.nf -profile cluster   
+2024-11-12 12:10:07 6.5s        tiny_elion          OK      d9de661ecc  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/filter.nf                       
+2024-11-12 12:10:24 2m 19s      nice_hopper         OK      8cef9f29d6  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/stan_example.nf -profile cluster
+2024-11-12 12:13:41 34.7s       clever_neumann      OK      713b74ac4a  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/pkg_gpu.nf                               
+2024-11-12 12:14:22 1m 50s      voluminous_coulomb  OK      9be41cea49  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/gpu.nf -profile cluster         
+2024-11-12 12:16:23 6m 26s      golden_poitras      OK      a68c131baa  2e019c7d-7c4e-42e5-b142-1dd6770fcb61    nextflow run nf-nest/examples/full.nf -profile cluster        </code></pre>
+</div>
+</div>
+<p>And we can see in the CSV that indeed the columns <code>seed</code> and <code>n_chains</code> were added to the left:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> <span class="at">-n</span> 2 deliverables/scriptName=full.nf/output/summary.csv </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>seed,n_chains,round,n_scans,n_tempered_restarts,global_barrier,global_barrier_variational,last_round_max_time,last_round_max_allocation,stepping_stone
+10,10,1,2,,8.998207738433418,,0.000288568,13536.0,-1173.429270641805</code></pre>
 </div>
 </div>
 

@@ -317,33 +317,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/params.nf <span class="at">-profile</span> cluster <span class="at">--n_rounds</span> 6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/params.nf` [happy_joliot] DSL2 - revision: 093b673fc8
-[71/d2fadf] Cached process &gt; instantiate_process
-[9c/0659ed] Cached process &gt; combine_workflow:instantiate_process
-[4d/72b110] Cached process &gt; precompile
-[ce/f1a696] Cached process &gt; combine_workflow:precompile
-[4b/3e423b] Submitted process &gt; run_julia (16)
-[d7/3af141] Submitted process &gt; run_julia (4)
-[b8/d7e4dc] Submitted process &gt; run_julia (7)
-[bb/0a7cfd] Submitted process &gt; run_julia (3)
-[e9/ae5559] Submitted process &gt; run_julia (9)
-[e7/fcbb74] Submitted process &gt; run_julia (12)
-[da/f228ef] Submitted process &gt; run_julia (1)
-[79/f258e4] Submitted process &gt; run_julia (13)
-[3b/21af06] Submitted process &gt; run_julia (10)
-[b8/dcf706] Submitted process &gt; run_julia (11)
-[d1/4a8583] Submitted process &gt; run_julia (2)
-[d8/d86e53] Submitted process &gt; run_julia (5)
-[0e/b0306c] Submitted process &gt; run_julia (8)
-[22/a8b690] Submitted process &gt; run_julia (6)
-[87/075a3e] Submitted process &gt; run_julia (15)
-[34/dd1cd7] Submitted process &gt; run_julia (14)
-[cb/757346] Submitted process &gt; run_julia (17)
-[85/7bb0a7] Submitted process &gt; run_julia (18)
-[8e/66a00a] Submitted process &gt; run_julia (20)
-[fe/7e6fa6] Submitted process &gt; run_julia (19)
-[09/f1b535] Submitted process &gt; combine_workflow:combine_process
-[64/776598] Submitted process &gt; plot</code></pre>
+Launching `nf-nest/examples/params.nf` [extravagant_swirles] DSL2 - revision: 093b673fc8
+[8c/a117a8] Cached process &gt; instantiate_process
+[5f/997727] Cached process &gt; combine_workflow:instantiate_process
+[72/cc3bb2] Cached process &gt; precompile
+[b9/57c5b2] Cached process &gt; combine_workflow:precompile
+[72/2cc9e6] Submitted process &gt; run_julia (12)
+[cb/0f4ef3] Submitted process &gt; run_julia (9)
+[7b/b152ab] Submitted process &gt; run_julia (3)
+[e1/afa275] Submitted process &gt; run_julia (8)
+[0f/43c83a] Submitted process &gt; run_julia (15)
+[1e/01aeed] Submitted process &gt; run_julia (14)
+[a0/e7e0ae] Submitted process &gt; run_julia (4)
+[7d/d461f8] Submitted process &gt; run_julia (2)
+[88/d0a075] Submitted process &gt; run_julia (1)
+[a6/5caec5] Submitted process &gt; run_julia (10)
+[20/581486] Submitted process &gt; run_julia (13)
+[86/f2ad4d] Submitted process &gt; run_julia (11)
+[42/6b0ba5] Submitted process &gt; run_julia (5)
+[88/275b85] Submitted process &gt; run_julia (6)
+[d6/1cfa52] Submitted process &gt; run_julia (16)
+[1e/635557] Submitted process &gt; run_julia (7)
+[e0/12866b] Submitted process &gt; run_julia (17)
+[0e/b48681] Submitted process &gt; run_julia (19)
+[09/a9a9e5] Submitted process &gt; run_julia (20)
+[dd/afd459] Submitted process &gt; run_julia (18)
+[82/3f2da5] Submitted process &gt; combine_workflow:combine_process
+[bd/575d2c] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 <p>Notice that the function <code>deliverables(workflow, params)</code> takes it into account so that the deliverables directory is organized correctly:</p>
@@ -351,18 +351,20 @@ Launching `nf-nest/examples/params.nf` [happy_joliot] DSL2 - revision: 093b673fc
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>experiment_repo/deliverables
-├── scriptName=full.nf___runName=intergalactic_jepsen
+├── scriptName=full.nf
 │&nbsp;&nbsp; ├── output
 │&nbsp;&nbsp; │&nbsp;&nbsp; ├── summary.csv
 │&nbsp;&nbsp; │&nbsp;&nbsp; └── swap_prs.csv
-│&nbsp;&nbsp; └── plot.png
-└── scriptName=params.nf___runName=happy_joliot___n_rounds=6
+│&nbsp;&nbsp; ├── plot.png
+│&nbsp;&nbsp; └── runName.txt
+└── scriptName=params.nf___n_rounds=6
     ├── output
     │&nbsp;&nbsp; ├── summary.csv
     │&nbsp;&nbsp; └── swap_prs.csv
-    └── plot.png
+    ├── plot.png
+    └── runName.txt
 
-4 directories, 6 files</code></pre>
+4 directories, 8 files</code></pre>
 </div>
 </div>
 </section>
@@ -414,10 +416,10 @@ Launching `nf-nest/examples/params.nf` [happy_joliot] DSL2 - revision: 093b673fc
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/dry_run.nf <span class="at">-profile</span> cluster <span class="at">--dryRun</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/dry_run.nf` [lonely_meninsky] DSL2 - revision: c7304bca14
-[71/d2fadf] Cached process &gt; instantiate_process
-[4d/72b110] Cached process &gt; precompile
-[29/6b28ad] Submitted process &gt; run_julia (1)</code></pre>
+Launching `nf-nest/examples/dry_run.nf` [boring_borg] DSL2 - revision: c7304bca14
+[8c/a117a8] Cached process &gt; instantiate_process
+[72/cc3bb2] Cached process &gt; precompile
+[84/b007e6] Submitted process &gt; run_julia (1)</code></pre>
 </div>
 </div>
 </section>
@@ -461,8 +463,8 @@ Launching `nf-nest/examples/dry_run.nf` [lonely_meninsky] DSL2 - revision: c7304
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/includes.nf </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/includes.nf` [mad_solvay] DSL2 - revision: f263a35a46
-[61/96fce3] Submitted process &gt; run_julia
+Launching `nf-nest/examples/includes.nf` [spontaneous_lorenz] DSL2 - revision: f263a35a46
+[47/6d05cf] Submitted process &gt; run_julia
 hello
 world</code></pre>
 </div>
