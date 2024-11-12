@@ -15,7 +15,7 @@ Containers such as Docker and apptainer address two issues:
 ## Using an existing container
 
 In the file `nextflow.config` provided in `nf-nest` we 
-provide an example of container documentation:
+provide an example of container configuration:
 
 ```{bash}
 head -n 28 experiment_repo/nextflow.config
