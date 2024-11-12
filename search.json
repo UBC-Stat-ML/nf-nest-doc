@@ -1,262 +1,182 @@
 [
   {
-    "objectID": "08_containers.html",
-    "href": "08_containers.html",
-    "title": "Containers",
+    "objectID": "09_gpu.html",
+    "href": "09_gpu.html",
+    "title": "GPU programming",
     "section": "",
-    "text": "Containers such as Docker and apptainer address two issues:\n\nmaking pipeline reproducible,\nwe do not have root access in HPC.",
+    "text": "In a context such as Sockeye where it is not possible to access GPU nodes with internet access, precompilation becomes more complicated than the earlier page on non-CUDA precompilation.\nWe provide a workaround, pkg_gpu.nf, which offers the same functionality as pkg.nf but is slower since all precompilation has to occur on the login node.\nFirst, add the package as before:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"CUDA\")\n\nNext, use the GPU precompilation script:\n\ncd experiment_repo \n./nextflow run nf-nest/pkg_gpu.nf \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/pkg_gpu.nf` [mad_goldstine] DSL2 - revision: 713b74ac4a\n[49/394bf6] Submitted process &gt; instantiate_process\n[b1/e64f5a] Submitted process &gt; precompile_gpu",
     "crumbs": [
-      "Containers"
+      "GPU programming"
     ]
   },
   {
-    "objectID": "08_containers.html#overview",
-    "href": "08_containers.html#overview",
-    "title": "Containers",
+    "objectID": "09_gpu.html#installing-cuda.jl",
+    "href": "09_gpu.html#installing-cuda.jl",
+    "title": "GPU programming",
     "section": "",
-    "text": "Containers such as Docker and apptainer address two issues:\n\nmaking pipeline reproducible,\nwe do not have root access in HPC.",
+    "text": "In a context such as Sockeye where it is not possible to access GPU nodes with internet access, precompilation becomes more complicated than the earlier page on non-CUDA precompilation.\nWe provide a workaround, pkg_gpu.nf, which offers the same functionality as pkg.nf but is slower since all precompilation has to occur on the login node.\nFirst, add the package as before:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"CUDA\")\n\nNext, use the GPU precompilation script:\n\ncd experiment_repo \n./nextflow run nf-nest/pkg_gpu.nf \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/pkg_gpu.nf` [mad_goldstine] DSL2 - revision: 713b74ac4a\n[49/394bf6] Submitted process &gt; instantiate_process\n[b1/e64f5a] Submitted process &gt; precompile_gpu",
     "crumbs": [
-      "Containers"
+      "GPU programming"
     ]
   },
   {
-    "objectID": "08_containers.html#using-an-existing-container",
-    "href": "08_containers.html#using-an-existing-container",
-    "title": "Containers",
-    "section": "Using an existing container",
-    "text": "Using an existing container\nIn the file nextflow.config provided in nf-nest we provide an example of container documentation:\n\nhead -n 26 experiment_repo/nextflow.config\n\nprofiles {\n    standard {  \n        docker.enabled = true\n        process {\n            withLabel:containerized {\n                container = 'alexandrebouchardcote/default:0.1.6'\n            }\n        }\n    }\n    cluster {\n        apptainer.enabled = true\n        process {\n            scratch = true\n            executor = 'slurm'\n            cpus = 1\n            memory = 4.GB\n            time = '2h'\n            clusterOptions = \"--nodes=1 --account $ALLOCATION_CODE\"\n\n            withLabel:containerized {\n                container = 'alexandrebouchardcote/default:0.1.6'\n                module = 'apptainer'\n            }\n        }\n    }\n}\n\n\nThere are two profiles, the default one using Docker, and the cluster one, using apptainer. We define a label for this container, which we call here containerized.\nTo instruct one of the process in the workflow to use that container, add the directive label 'containerized'.\nHere is an example of a process to compile and run a Stan program, where Stan is part of the above container:\n\nprocess compile_stan {\n    label 'containerized' \n\n    input:\n        path stan_file\n    output:\n        path \"${stan_file.baseName}\"\n        \n    \"\"\"\n    # name of stan file without extension\n    base_name=`basename $stan_file .stan`\n\n    # need to run Stan's make file from the CMDSTAN dir\n    CUR=`pwd`\n    cd \\$CMDSTAN\n    make \\$CUR/\\$base_name\n    \"\"\"\n}\n\nprocess run_stan {\n    label 'containerized' \n\n    input:\n        path stan_exec \n        path data\n\n    \"\"\"\n    ./$stan_exec sample \\\n        data file=$data \\\n        output file=samples.csv \n\n    # Compute ESS from Stan's stansummary utility\n    \\$CMDSTAN/bin/stansummary samples.csv --csv_filename ess.csv\n    \"\"\"\n}\n\nHere is an example workflow using these containerized processes:\n\ninclude { compile_stan; run_stan; } from \"./stan.nf\"\n\ndef stanModel = file(\"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.stan\")\ndef data = file(\"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.data.json\")\n\nworkflow {\n    compiled = compile_stan(stanModel)\n    run_stan(compiled, data)\n}\n\nTo run it:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/stan_example.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/stan_example.nf` [evil_euclid] DSL2 - revision: 8cef9f29d6\nWARN: Apptainer cache directory has not been defined -- Remote image will be stored in the path: /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity -- Use the environment variable NXF_APPTAINER_CACHEDIR to specify a different location\nPulling Apptainer image docker://alexandrebouchardcote/default:0.1.6 [cache /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity/alexandrebouchardcote-default-0.1.6.img]\n[7a/1613d3] Submitted process &gt; compile_stan\n[32/fc72f4] Submitted process &gt; run_stan",
+    "objectID": "09_gpu.html#running-nextflow-processes-requiring-gpu",
+    "href": "09_gpu.html#running-nextflow-processes-requiring-gpu",
+    "title": "GPU programming",
+    "section": "Running nextflow processes requiring GPU",
+    "text": "Running nextflow processes requiring GPU\nAn example of a workflow using GPUs:\n\ninclude { instantiate; precompile_gpu; } from \"../pkg_gpu.nf\"\ninclude { activate; } from \"../pkg.nf\"\n\ndef julia_env = file('julia_env')\n\nworkflow {\n    instantiate(julia_env) | precompile_gpu | run_julia\n}\n\nprocess run_julia {\n    debug true\n    label 'gpu'\n    input:\n        path julia_env\n    \"\"\"\n    ${activate(julia_env)}\n\n    using CUDA \n\n    println(\"CPU\")\n    x = rand(5000, 5000);\n    @time x * x;\n    @time x * x;\n\n    println(\"GPU\")\n    x = CUDA.rand(5000, 5000);\n    @time x * x;\n    @time x * x;\n\n    CUDA.versioninfo()\n    \"\"\"\n}\n\nWe run it using the same command as usual:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/gpu.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/gpu.nf` [happy_goldberg] DSL2 - revision: 9be41cea49\n[be/5a7e4e] Submitted process &gt; instantiate_process\n[c5/2f10a1] Submitted process &gt; precompile_gpu\n[85/0c764a] Submitted process &gt; run_julia\nCPU\n 13.170952 seconds (4.79 M allocations: 517.701 MiB, 3.76% gc time, 17.14% compilation time)\n 10.471519 seconds (2 allocations: 190.735 MiB, 0.07% gc time)\nGPU\n  1.527329 seconds (1.67 M allocations: 107.375 MiB, 96.08% compilation time)\n  0.000572 seconds (50 allocations: 1.172 KiB)\nCUDA runtime 12.5, artifact installation\nCUDA driver 12.6\nNVIDIA driver 550.90.12\n\nCUDA libraries: \n- CUBLAS: 12.5.3\n- CURAND: 10.3.6\n- CUFFT: 11.2.3\n- CUSOLVER: 11.6.3\n- CUSPARSE: 12.5.1\n- CUPTI: 2024.2.1 (API 23.0.0)\n- NVML: 12.0.0+550.90.12\n\nJulia packages: \n- CUDA: 5.5.2\n- CUDA_Driver_jll: 0.10.3+0\n- CUDA_Runtime_jll: 0.15.3+0\n\nToolchain:\n- Julia: 1.10.2\n- LLVM: 15.0.7\n\nPreferences:\n- CUDA_Runtime_jll.version: 12.5\n\n1 device:\n  0: Tesla V100-SXM2-32GB (sm_70, 31.137 GiB / 32.000 GiB available)",
     "crumbs": [
-      "Containers"
+      "GPU programming"
     ]
   },
   {
-    "objectID": "08_containers.html#creating-containers",
-    "href": "08_containers.html#creating-containers",
-    "title": "Containers",
-    "section": "Creating containers",
-    "text": "Creating containers\nThere are many reference online for creating containers in general, but much less on creating cross-platform containers working on both x86 and Apple Silicon.\nWe have created some script to help doing this, see code and instructions at this page.",
+    "objectID": "09_gpu.html#gpu-kernel-development",
+    "href": "09_gpu.html#gpu-kernel-development",
+    "title": "GPU programming",
+    "section": "GPU kernel development",
+    "text": "GPU kernel development\nOne way to leverage GPUs is to use array programming as demonstrated in the example above. When a problem cannot be cast into an array problem, an alternative is to construct a custom GPU kernel.\nDesigning custom GPU kernels is especially attractive in Julia. This is in big part thanks to\nKernelAbstractions.jl, which allows the same code to be emit both CPU and GPU versions. Since error messages are easier to interpret when doing CPU development, it is useful to be able to test both CPU and GPU targets.\nCompared to Julia CPU development, the main constraint when doing GPU development is that inside the kernel there should not be heap allocations. Seasoned Julia developers are often already often avoiding to allocate in the inner loop due to garbage collection costs.\nFor a concrete example of KernelAbstractions.jl in action, see these kernels used to implement Sequential Annealed Importance Sampling.",
     "crumbs": [
-      "Containers"
+      "GPU programming"
     ]
   },
   {
-    "objectID": "05_pkg.html",
-    "href": "05_pkg.html",
-    "title": "Managing Julia packages on HPC",
+    "objectID": "07_combine.html",
+    "href": "07_combine.html",
+    "title": "Combine outputs",
     "section": "",
-    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
+    "text": "Now that we know how to run many jobs, the next question is how to combine the output of all these jobs to analyze it.",
     "crumbs": [
-      "Add Julia packages on HPC"
+      "Combine outputs"
     ]
   },
   {
-    "objectID": "05_pkg.html#overview",
-    "href": "05_pkg.html#overview",
-    "title": "Managing Julia packages on HPC",
+    "objectID": "07_combine.html#overview",
+    "href": "07_combine.html#overview",
+    "title": "Combine outputs",
     "section": "",
-    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
+    "text": "Now that we know how to run many jobs, the next question is how to combine the output of all these jobs to analyze it.",
     "crumbs": [
-      "Add Julia packages on HPC"
+      "Combine outputs"
     ]
   },
   {
-    "objectID": "05_pkg.html#julia-environment",
-    "href": "05_pkg.html#julia-environment",
-    "title": "Managing Julia packages on HPC",
-    "section": "Julia environment",
-    "text": "Julia environment\nA Julia environment is a specification of all package dependencies and their versions.\nBy convention, we will store it in a directory called experiment_repo/julia_env.",
-    "crumbs": [
-      "Add Julia packages on HPC"
-    ]
-  },
-  {
-    "objectID": "05_pkg.html#adding-a-package",
-    "href": "05_pkg.html#adding-a-package",
-    "title": "Managing Julia packages on HPC",
-    "section": "Adding a package",
-    "text": "Adding a package\nThere are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.\nIn both syntaxes, we first need to tell Julia which environment to use. This is called “activating” an environment.\n\nInteractive Julia package manager\nThe most common method is to use the interactive Julia package manager. To start it, type ] followed by enter.\nActivating is done with the activate keyword.\nYou can then add a package using the add command. The argument of add can be either a registered Julia package, for example we show here how to add the Pigeons package for MCMC sampling:\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\n]\nactivate experiment_repo/julia_env\nadd Pigeons\nAlternatively, the package can be a git repository, optionally with a specific commit/tag:\nadd Example@0.5\nadd Example#master\nadd Example#c37b675\nadd https://github.com/JuliaLang/Example.jl#master\nadd git@github.com:JuliaLang/Example.jl.git\nadd \"git@github.com:JuliaLang/Example.jl.git\"#master\nadd https://github.com/Company/MonoRepo:juliapkgs/Package.jl\nTo exit the interactive Julia package manager, type control-C.\n\n\nProgrammatic interface\nAlternatively, a programmatic interface is also available for scripting:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"Pigeons\")",
-    "crumbs": [
-      "Add Julia packages on HPC"
-    ]
-  },
-  {
-    "objectID": "05_pkg.html#precompilation-on-hpc",
-    "href": "05_pkg.html#precompilation-on-hpc",
-    "title": "Managing Julia packages on HPC",
-    "section": "Precompilation on HPC",
-    "text": "Precompilation on HPC\nOnce we have downloaded the packages in the login node, we now turn to the task of performing pre-compilation.\n\ncd experiment_repo \n./nextflow run nf-nest/pkg.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/pkg.nf` [ridiculous_kimura] DSL2 - revision: 869ec1e084\n[66/62a35b] Submitted process &gt; instantiate_process\n[dc/792d97] Submitted process &gt; precompile\n\n\nOptionally, you can append an argument to specify the number of threads to request and use during pre-compilation: e.g. add --nPrecompileThreads 20 to request 20 threads instead of the default of 10.",
-    "crumbs": [
-      "Add Julia packages on HPC"
-    ]
-  },
-  {
-    "objectID": "05_pkg.html#testing-your-julia-environment-interactively",
-    "href": "05_pkg.html#testing-your-julia-environment-interactively",
-    "title": "Managing Julia packages on HPC",
-    "section": "Testing your Julia environment interactively",
-    "text": "Testing your Julia environment interactively\nIn the code above, we have added the package Pigeons as an example.\nTo interactively test an installed package, simply activate the environment from a Julia session:\n\nusing Pkg\nPkg.activate(\"experiment_repo/julia_env\")\n\nusing Pigeons\npigeons(target = toy_mvn_target(1000))",
-    "crumbs": [
-      "Add Julia packages on HPC"
-    ]
-  },
-  {
-    "objectID": "05_pkg.html#more-information",
-    "href": "05_pkg.html#more-information",
-    "title": "Managing Julia packages on HPC",
-    "section": "More information",
-    "text": "More information\nSee Pkg.jl documentation.",
-    "crumbs": [
-      "Add Julia packages on HPC"
-    ]
-  },
-  {
-    "objectID": "03_create-exp-repo.html",
-    "href": "03_create-exp-repo.html",
-    "title": "Creating an experiment repo",
-    "section": "",
-    "text": "We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.\nIt consists in a git repository with:\n\nthe nextflow executable and its configuration, nextflow.config;\na git submodule, nf-nest containing useful tools;\nyour .nf files and other supporting files.\n\nThis pages explains how to setup an experiment repo.",
-    "crumbs": [
-      "Create an experiment repo"
-    ]
-  },
-  {
-    "objectID": "03_create-exp-repo.html#overview",
-    "href": "03_create-exp-repo.html#overview",
-    "title": "Creating an experiment repo",
-    "section": "",
-    "text": "We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.\nIt consists in a git repository with:\n\nthe nextflow executable and its configuration, nextflow.config;\na git submodule, nf-nest containing useful tools;\nyour .nf files and other supporting files.\n\nThis pages explains how to setup an experiment repo.",
-    "crumbs": [
-      "Create an experiment repo"
-    ]
-  },
-  {
-    "objectID": "03_create-exp-repo.html#location",
-    "href": "03_create-exp-repo.html#location",
-    "title": "Creating an experiment repo",
-    "section": "Location",
-    "text": "Location\nIn an HPC context, the experiment repo should be in a read/write location accessible to all nodes.\nFor example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/\nA second choice would be to use the scratch space, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/",
-    "crumbs": [
-      "Create an experiment repo"
-    ]
-  },
-  {
-    "objectID": "03_create-exp-repo.html#sec-instructions",
-    "href": "03_create-exp-repo.html#sec-instructions",
-    "title": "Creating an experiment repo",
-    "section": "Instructions",
-    "text": "Instructions\nFor quick setup, run the following commands:\n\n# create a directory and cd into it\nmkdir experiment_repo && cd $_\n\ngit init\n\n# setup nextflow\ncurl -s https://get.nextflow.io | bash\n\n# add nf-nest utilities\ngit submodule add https://github.com/UBC-Stat-ML/nf-nest.git\n\n# copy template for nextflow configurations\ncp nf-nest/nextflow.config .",
-    "crumbs": [
-      "Create an experiment repo"
-    ]
-  },
-  {
-    "objectID": "06_cross_product.html",
-    "href": "06_cross_product.html",
-    "title": "Job cross products",
-    "section": "",
-    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
-    "crumbs": [
-      "Job cross products"
-    ]
-  },
-  {
-    "objectID": "06_cross_product.html#overview",
-    "href": "06_cross_product.html#overview",
-    "title": "Job cross products",
-    "section": "",
-    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
-    "crumbs": [
-      "Job cross products"
-    ]
-  },
-  {
-    "objectID": "06_cross_product.html#example",
-    "href": "06_cross_product.html#example",
-    "title": "Job cross products",
+    "objectID": "07_combine.html#example",
+    "href": "07_combine.html#example",
+    "title": "Combine outputs",
     "section": "Example",
-    "text": "Example\nAs a toy example, suppose we want to compute all additions of the form a + b where a and b are integers from 1 to 3. In addition, we also want a * b. This means we will need \\(3 \\times 3 \\times 2\\) calculations.\nWe can characterize the inputs a the cross-product denoted \\(\\{1, 2, 3\\} \\times \\{1, 2, 3\\} \\times \\{+, *\\}\\).",
+    "text": "Example\nWe will run Pigeons on the cross product formed by calling crossProduct(variables) with:\ndef variables = [\n    seed: 1..10,\n    n_chains: [10, 20], \n]\nSuppose we want to create a plot from the output of these 20 Julia processes.",
     "crumbs": [
-      "Job cross products"
+      "Combine outputs"
     ]
   },
   {
-    "objectID": "06_cross_product.html#nextflow-script",
-    "href": "06_cross_product.html#nextflow-script",
-    "title": "Job cross products",
+    "objectID": "07_combine.html#strategy",
+    "href": "07_combine.html#strategy",
+    "title": "Combine outputs",
+    "section": "Strategy",
+    "text": "Strategy\nEach Julia process will create a folder. Using a function, we will provide an automatic name to this folder encoding the inputs used (seed and n_chains). That name is provided by nf-nest’s filed() function. In that folder, we will\nput csv files.\nThen, once all Julia processes are done, another utilities from nf-nest, combine_csvs, will merge all CSVs while adding columns for the inputs (here, seed and n_chains).\nFinally, we will pass the merged CSVs to a plotting process.",
+    "crumbs": [
+      "Combine outputs"
+    ]
+  },
+  {
+    "objectID": "07_combine.html#nextflow-script",
+    "href": "07_combine.html#nextflow-script",
+    "title": "Combine outputs",
     "section": "Nextflow script",
-    "text": "Nextflow script\nThe script below will perform the following operations.\n\n// we use utilities in the nf-nest submodule\n// in user scripts, path would be './nf-nest/cross.nf' \ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\n\ndef variables = [\n    first: 1..3,\n    second: 1..3,\n    operation: [\"+\", \"*\"]\n]\n\n// specifies the order of operations\nworkflow {\n    // look at all combinations of variables\n    configs = crossProduct(variables)\n    // run Julia on 18 nodes!\n    run_julia(configs)\n\n    // equivalent syntax:\n    // crossProduct(variables) | run_julia\n}\n\nprocess run_julia {\n    debug true // by default, standard out is not shown, use this to show it\n    \n    // information used when submitting job to queue\n    time 2.min\n    cpus 1 \n    memory 5.GB\n\n    input:\n        val config \n    \"\"\"\n    ${activate()}\n    # ^ this is just a shortcut for:\n    #!/usr/bin/env julia --threads=1\n\n    @show ${config.first} ${config.operation} ${config.second}\n    \"\"\"\n}\n\nFor more information:\n\nRead on the nextflow scripting language\nRead on nextflow’s process block\nconfigs in the above is an example of a nextflow Channel\nMore on nextflow’s workflow block",
+    "text": "Nextflow script\n\n// includes are relative to the .nf file, should always start with ./ or ../\ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\ninclude { combine_csvs; } from '../combine.nf'\n\n// in contrast, file(..) is relative to `pwd`, use projectDir/ \n//   to make it relative to main .nf file, or moduleDir for the .nf file\ndef julia_env = file(moduleDir/'julia_env')\ndef plot_script = file(moduleDir/'plot.jl')\n\ndef variables = [\n    seed: 1..10,\n    n_chains: [10, 20], \n]\n\nworkflow {\n    compiled_env = instantiate(julia_env) | precompile\n    configs = crossProduct(variables)\n    combined = run_julia(compiled_env, configs) | combine_csvs\n    plot(compiled_env, plot_script, combined)\n}\n\nprocess run_julia {\n    input:\n        path julia_env \n        val config \n    output:\n        path \"${filed(config)}\"\n    \"\"\"\n    ${activate(julia_env)}\n\n    # run your code\n    using Pigeons \n    using CSV \n    pt = pigeons(\n            target = toy_mvn_target(1000), \n            n_chains = ${config.n_chains}, \n            seed = ${config.seed})\n\n    # organize output as follows:\n    #   - create a directory with name controlled by filed(config)\n    #     to keep track of input configuration\n    #   - put any number of CSV in there\n    mkdir(\"${filed(config)}\")\n    CSV.write(\"${filed(config)}/summary.csv\", pt.shared.reports.summary)\n    CSV.write(\"${filed(config)}/swap_prs.csv\", pt.shared.reports.swap_prs)\n    \"\"\"\n}\n\nprocess plot {\n    input:\n        path julia_env \n        path plot_script\n        path combined_csvs_folder \n    output:\n        path '*.png'\n        path combined_csvs_folder\n    publishDir \"${deliverables(workflow, params)}\", mode: 'copy', overwrite: true\n    \"\"\"\n    ${activate(julia_env)}\n\n    include(\"$plot_script\")\n    create_plots(\"$combined_csvs_folder\")\n    \"\"\"\n}",
     "crumbs": [
-      "Job cross products"
+      "Combine outputs"
     ]
   },
   {
-    "objectID": "06_cross_product.html#running-the-script",
-    "href": "06_cross_product.html#running-the-script",
-    "title": "Job cross products",
-    "section": "Running the script",
-    "text": "Running the script\nRunning it with the -profile cluster option will:\n\nbuild a cross-product from variables\nfor each one, automatically create submission scripts\nrun these Julia processes and show the standard out.\n\nFrom the command line, running the script is done as follows:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/many_jobs.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/many_jobs.nf` [focused_noyce] DSL2 - revision: aa082b1978\n[9c/041eac] Submitted process &gt; run_julia (14)\n[3a/08d0fc] Submitted process &gt; run_julia (7)\n[c3/f720db] Submitted process &gt; run_julia (1)\n[3a/f4f09a] Submitted process &gt; run_julia (6)\n[94/1979eb] Submitted process &gt; run_julia (10)\n[4d/d5d1e6] Submitted process &gt; run_julia (5)\n[29/2c5b80] Submitted process &gt; run_julia (11)\n[ad/7de00b] Submitted process &gt; run_julia (16)\n[65/e00cc7] Submitted process &gt; run_julia (8)\n[db/0851c9] Submitted process &gt; run_julia (15)\n[7a/0e5860] Submitted process &gt; run_julia (13)\n[32/c8e818] Submitted process &gt; run_julia (4)\n[04/e7c201] Submitted process &gt; run_julia (2)\n[79/8c9cab] Submitted process &gt; run_julia (3)\n[f5/056c34] Submitted process &gt; run_julia (9)\n[fa/727945] Submitted process &gt; run_julia (12)\n[94/38e9bd] Submitted process &gt; run_julia (17)\n[f1/e98561] Submitted process &gt; run_julia (18)\n3 * 1 = 3\n1 + 1 = 2\n2 + 1 = 3\n1 * 3 = 3\n2 * 2 = 4\n1 + 3 = 4\n2 + 3 = 5\n3 * 2 = 6\n2 * 1 = 2\n3 + 2 = 5\n3 + 1 = 4\n1 * 2 = 2\n1 * 1 = 1\n1 + 2 = 3\n2 + 2 = 4\n2 * 3 = 6\n3 + 3 = 6\n3 * 3 = 9",
+    "objectID": "07_combine.html#running-the-nextflow-script",
+    "href": "07_combine.html#running-the-nextflow-script",
+    "title": "Combine outputs",
+    "section": "Running the nextflow script",
+    "text": "Running the nextflow script\n\ncd experiment_repo\n./nextflow run nf-nest/examples/full.nf -profile cluster \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/full.nf` [gloomy_bardeen] DSL2 - revision: a68c131baa\n[e6/bd72b0] Submitted process &gt; combine_workflow:instantiate_process\n[90/17eb99] Submitted process &gt; instantiate_process\n[25/e00629] Submitted process &gt; precompile\n[c6/fe533e] Submitted process &gt; combine_workflow:precompile\n[d7/6278f0] Submitted process &gt; run_julia (1)\n[95/26225c] Submitted process &gt; run_julia (12)\n[f4/c2cfc4] Submitted process &gt; run_julia (11)\n[72/daab8f] Submitted process &gt; run_julia (15)\n[13/c967f1] Submitted process &gt; run_julia (2)\n[1b/620546] Submitted process &gt; run_julia (6)\n[58/4cf41c] Submitted process &gt; run_julia (7)\n[88/dc6041] Submitted process &gt; run_julia (10)\n[ec/0b8ff7] Submitted process &gt; run_julia (3)\n[85/3f52e3] Submitted process &gt; run_julia (13)\n[7a/da04ae] Submitted process &gt; run_julia (8)\n[65/94d65f] Submitted process &gt; run_julia (16)\n[e5/613077] Submitted process &gt; run_julia (5)\n[4b/8734be] Submitted process &gt; run_julia (14)\n[d6/0b5cc7] Submitted process &gt; run_julia (4)\n[60/5c6106] Submitted process &gt; run_julia (9)\n[44/070feb] Submitted process &gt; run_julia (18)\n[bb/a2be64] Submitted process &gt; run_julia (17)\n[5c/c1f32d] Submitted process &gt; run_julia (20)\n[f3/9bf9d2] Submitted process &gt; run_julia (19)\n[66/ec5b2f] Submitted process &gt; combine_workflow:combine_process\n[6d/e06477] Submitted process &gt; plot",
     "crumbs": [
-      "Job cross products"
+      "Combine outputs"
     ]
   },
   {
-    "objectID": "01_intro.html",
-    "href": "01_intro.html",
-    "title": "Intro",
+    "objectID": "07_combine.html#accessing-the-output",
+    "href": "07_combine.html#accessing-the-output",
+    "title": "Combine outputs",
+    "section": "Accessing the output",
+    "text": "Accessing the output\nEach nextflow process is associated with a unique work directory to ensure the processes do not interfere with each other. Here we cover two ways to quickly access these work directories.\n\nQuick inspection\nA quick way to find the output of a nextflow process that we just ran is to use:\ncd experiment_repo \nnf-nest/nf-open\nThis lists the work folders for the last nextflow job.\n\n\nOrganizing the output with a publishDir\nA better approach is to use the publishDir directive, combined with nf-nest’s deliverables() utility, as illustrated in the run_julia process above. This will automatically copy the output of the process associated with the directive in a sub-directory of experiment_repo/deliverables.\n\ntree experiment_repo/deliverables\n\nexperiment_repo/deliverables\n└── scriptName=full.nf___runName=gloomy_bardeen\n    ├── output\n    │   ├── summary.csv\n    │   └── swap_prs.csv\n    └── plot.png\n\n2 directories, 3 files\n\n\nHere the runName can be used with nextflow’s log command to obtain more information on the run.\n\ncd experiment_repo\n./nextflow log\n\nTIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                \n2024-11-11 20:52:00 3.1s        insane_wegener      OK      9d1a692a7e  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/hello.nf                 \n2024-11-11 20:52:07 7.4s        voluminous_banach   OK      9d1a692a7e  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/hello.nf -profile cluster\n2024-11-11 20:53:06 47.7s       reverent_curran     OK      fc0374e695  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/pkg.nf -profile cluster           \n2024-11-11 20:54:16 5m 49s      gloomy_bardeen      OK      a68c131baa  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/full.nf -profile cluster",
+    "crumbs": [
+      "Combine outputs"
+    ]
+  },
+  {
+    "objectID": "04_launch.html",
+    "href": "04_launch.html",
+    "title": "Launching an experiment",
     "section": "",
-    "text": "Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. It is crucial to have good tools to coordinate and organize these experiments.",
+    "text": "We show how to launch an “experiment”, i.e., a nextflow script.\nWe cover two ways to launch an experiment:\n\nLocal: where all processes (nodes in the workflow graph) run in the same machine.\nCluster where each node in the graph can run in different machines in a cluster.\n\nMethod 1 is useful to run experiments on a laptop and for prototyping.\nSurprisingly, thanks to nextflow, method 2 only involves adding the command line option -profile cluster. This is because nextflow takes care of generating submission scripts, transferring files and orchestring everything.",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
     ]
   },
   {
-    "objectID": "01_intro.html#context",
-    "href": "01_intro.html#context",
-    "title": "Intro",
+    "objectID": "04_launch.html#overview",
+    "href": "04_launch.html#overview",
+    "title": "Launching an experiment",
     "section": "",
-    "text": "Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. It is crucial to have good tools to coordinate and organize these experiments.",
+    "text": "We show how to launch an “experiment”, i.e., a nextflow script.\nWe cover two ways to launch an experiment:\n\nLocal: where all processes (nodes in the workflow graph) run in the same machine.\nCluster where each node in the graph can run in different machines in a cluster.\n\nMethod 1 is useful to run experiments on a laptop and for prototyping.\nSurprisingly, thanks to nextflow, method 2 only involves adding the command line option -profile cluster. This is because nextflow takes care of generating submission scripts, transferring files and orchestring everything.",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
     ]
   },
   {
-    "objectID": "01_intro.html#nf-nest",
-    "href": "01_intro.html#nf-nest",
-    "title": "Intro",
-    "section": "nf-nest",
-    "text": "nf-nest\nThis webpage documents nf-nest, a collection of small but powerful utilities built on nextflow to help accomplish this.\nAspects taken into account:\n\nAutomating cross-product of input parameters in experiments.\nAutomating creation of submission scripts and ordering of jobs (taking care of moving across file system, dynamic memory requirements, etc).\nAutomating the gathering of results from many runs.\nCaching already ran jobs.\nRobustness to failure.\nReproducibility via apptainer and docker, supporting both x86 and apple silicon.\nSupport for GPU programming.",
+    "objectID": "04_launch.html#example-nextflow-script",
+    "href": "04_launch.html#example-nextflow-script",
+    "title": "Launching an experiment",
+    "section": "Example nextflow script",
+    "text": "Example nextflow script\nThe nf-nest repo contains a small example nextflow script, which we will use to demonstrate the two ways to launch an experiment. Here is the script for reference:\n\nworkflow  {\n    hello()\n}\n\nprocess hello {\n    debug true \n    \"\"\"\n    echo Hello world!\n    \"\"\"\n}",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
     ]
   },
   {
-    "objectID": "01_intro.html#technology-stack",
-    "href": "01_intro.html#technology-stack",
-    "title": "Intro",
-    "section": "Technology stack",
-    "text": "Technology stack\nnf-nest uses the following open source projects:\n\nNextflow: can be thought of as an “operating system” for coordinating numerical experiments.\nJulia: a programming language to unlock full access to high performance computation on both CPUs and GPUs.\n\nWhile some features of nf-nest are Julia specific, other parts are language agnostic.",
+    "objectID": "04_launch.html#local-execution",
+    "href": "04_launch.html#local-execution",
+    "title": "Launching an experiment",
+    "section": "Local execution",
+    "text": "Local execution\nUse the following command to run the nextflow script locally:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/hello.nf\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/hello.nf` [insane_wegener] DSL2 - revision: 9d1a692a7e\n[df/47fcee] Submitted process &gt; hello\nHello world!",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
     ]
   },
   {
-    "objectID": "01_intro.html#background",
-    "href": "01_intro.html#background",
-    "title": "Intro",
-    "section": "Background",
-    "text": "Background\n\nScientific workflow\nA scientific workflow is a directed acyclic graph where each node is a process and each edge between node \\(n\\) to \\(n'\\) denote that at least one output of process \\(n\\) is fed as an input to process \\(n'\\).\nHere is an example from a workflow covered later in this tutorial:\n\n\n\n\n\nflowchart TB\n    subgraph \" \"\n    v0[\"julia_env\"]\n    v1[\"toml\"]\n    v4[\"Channel.fromList\"]\n    v7[\"julia_env\"]\n    v8[\"toml\"]\n    v12[\"plot_script\"]\n    end\n    v2([instantiate_process])\n    v3([precompile])\n    v5([run_julia])\n    subgraph combine_workflow\n    v9([instantiate_process])\n    v10([precompile])\n    v11([combine_process])\n    end\n    v13([plot])\n    subgraph \" \"\n    v14[\"combined_csvs_folder\"]\n    v15[\" \"]\n    end\n    v6(( ))\n    v0 --&gt; v2\n    v1 --&gt; v2\n    v2 --&gt; v3\n    v3 --&gt; v5\n    v3 --&gt; v13\n    v4 --&gt; v5\n    v5 --&gt; v6\n    v7 --&gt; v9\n    v8 --&gt; v9\n    v9 --&gt; v10\n    v10 --&gt; v11\n    v6 --&gt; v11\n    v11 --&gt; v13\n    v12 --&gt; v13\n    v13 --&gt; v15\n    v13 --&gt; v14",
+    "objectID": "04_launch.html#cluster-execution",
+    "href": "04_launch.html#cluster-execution",
+    "title": "Launching an experiment",
+    "section": "Cluster execution",
+    "text": "Cluster execution\nTo run on a cluster, add the argument -profile cluster which instructs nextflow to use the configs in section cluster { ... } of the file nextflow.config created in the setup instructions.1\nHere is a minimal example:\n\n./nextflow run nf-nest/examples/hello.nf -profile cluster \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/hello.nf` [voluminous_banach] DSL2 - revision: 9d1a692a7e\n[df/47fcee] Cached process &gt; hello\nHello world!",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
     ]
   },
   {
-    "objectID": "01_intro.html#more-information",
-    "href": "01_intro.html#more-information",
-    "title": "Intro",
-    "section": "More information",
-    "text": "More information\nBoth nextflow and Julia have excellent and extensive documentation.\n\nNexflow documentation\nJulia documentation",
+    "objectID": "04_launch.html#managing-long-executions",
+    "href": "04_launch.html#managing-long-executions",
+    "title": "Launching an experiment",
+    "section": "Managing long executions",
+    "text": "Managing long executions\nWhen starting a job, the launching nextflow process needs to stay alive until the end of the last job. However, when the SSH connection is lost (e.g., you close your laptop), the nextflow process and hence child jobs will be killed. To avoid this, use screen or tmux which allows you to preserve a SSH session even if the SSH connection is closed.\n\nBasic instructions to start a long job\n\nTake note of which of the login nodes you are starting the job (e.g. in Sockeye, login01, login02 or login03).\nList existing tmux sessions with tmux ls\nCreate one with tmux or join last one with tmux a\nStart the nextflow.\nTo detach the tmux session ctrl-b followed by d\n\n\n\nLook at the status after being disconnected\n\nSSH in.\nIf you are in the wrong login node, use e.g., ssh login02 (follow 2FA instruction)\nReattach with tmux a\n\nFor more information on tmux, use this cheat sheet.\n\n\nCancelling a nextflow workflow\nPress ctrl-c only once. This will instruct nextflow to clean up children jobs: killing running jobs, as well as cancelling queued jobs.",
     "crumbs": [
-      "Introduction"
+      "Launch an experiment"
+    ]
+  },
+  {
+    "objectID": "04_launch.html#footnotes",
+    "href": "04_launch.html#footnotes",
+    "title": "Launching an experiment",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nIn the previous section (“local execution”), where we did not specify a -profile, the default profile named standard is used.↩︎",
+    "crumbs": [
+      "Launch an experiment"
     ]
   },
   {
@@ -400,143 +320,263 @@
     ]
   },
   {
-    "objectID": "04_launch.html",
-    "href": "04_launch.html",
-    "title": "Launching an experiment",
+    "objectID": "01_intro.html",
+    "href": "01_intro.html",
+    "title": "Intro",
     "section": "",
-    "text": "We show how to launch an “experiment”, i.e., a nextflow script.\nWe cover two ways to launch an experiment:\n\nLocal: where all processes (nodes in the workflow graph) run in the same machine.\nCluster where each node in the graph can run in different machines in a cluster.\n\nMethod 1 is useful to run experiments on a laptop and for prototyping.\nSurprisingly, thanks to nextflow, method 2 only involves adding the command line option -profile cluster. This is because nextflow takes care of generating submission scripts, transferring files and orchestring everything.",
+    "text": "Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. It is crucial to have good tools to coordinate and organize these experiments.",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#overview",
-    "href": "04_launch.html#overview",
-    "title": "Launching an experiment",
+    "objectID": "01_intro.html#context",
+    "href": "01_intro.html#context",
+    "title": "Intro",
     "section": "",
-    "text": "We show how to launch an “experiment”, i.e., a nextflow script.\nWe cover two ways to launch an experiment:\n\nLocal: where all processes (nodes in the workflow graph) run in the same machine.\nCluster where each node in the graph can run in different machines in a cluster.\n\nMethod 1 is useful to run experiments on a laptop and for prototyping.\nSurprisingly, thanks to nextflow, method 2 only involves adding the command line option -profile cluster. This is because nextflow takes care of generating submission scripts, transferring files and orchestring everything.",
+    "text": "Large scale numerical experiments are central to much of contemporary scientific and mathematical research. Performing these numerical experiments in a valid, reproducible and scalable fashion is not easy. Even a small typical project may need to run 1000s of executions, and 10k+ is not uncommon. It is crucial to have good tools to coordinate and organize these experiments.",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#example-nextflow-script",
-    "href": "04_launch.html#example-nextflow-script",
-    "title": "Launching an experiment",
-    "section": "Example nextflow script",
-    "text": "Example nextflow script\nThe nf-nest repo contains a small example nextflow script, which we will use to demonstrate the two ways to launch an experiment. Here is the script for reference:\n\nworkflow  {\n    hello()\n}\n\nprocess hello {\n    debug true \n    \"\"\"\n    echo Hello world!\n    \"\"\"\n}",
+    "objectID": "01_intro.html#nf-nest",
+    "href": "01_intro.html#nf-nest",
+    "title": "Intro",
+    "section": "nf-nest",
+    "text": "nf-nest\nThis webpage documents nf-nest, a collection of small but powerful utilities built on nextflow to help accomplish this.\nAspects taken into account:\n\nAutomating cross-product of input parameters in experiments.\nAutomating creation of submission scripts and ordering of jobs (taking care of moving across file system, dynamic memory requirements, etc).\nAutomating the gathering of results from many runs.\nCaching already ran jobs.\nRobustness to failure.\nReproducibility via apptainer and docker, supporting both x86 and apple silicon.\nSupport for GPU programming.",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#local-execution",
-    "href": "04_launch.html#local-execution",
-    "title": "Launching an experiment",
-    "section": "Local execution",
-    "text": "Local execution\nUse the following command to run the nextflow script locally:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/hello.nf\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/hello.nf` [furious_chandrasekhar] DSL2 - revision: 9d1a692a7e\n[5c/b3ec9c] Submitted process &gt; hello\nHello world!",
+    "objectID": "01_intro.html#technology-stack",
+    "href": "01_intro.html#technology-stack",
+    "title": "Intro",
+    "section": "Technology stack",
+    "text": "Technology stack\nnf-nest uses the following open source projects:\n\nNextflow: can be thought of as an “operating system” for coordinating numerical experiments.\nJulia: a programming language to unlock full access to high performance computation on both CPUs and GPUs.\n\nWhile some features of nf-nest are Julia specific, other parts are language agnostic.",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#cluster-execution",
-    "href": "04_launch.html#cluster-execution",
-    "title": "Launching an experiment",
-    "section": "Cluster execution",
-    "text": "Cluster execution\nTo run on a cluster, add the argument -profile cluster which instructs nextflow to use the configs in section cluster { ... } of the file nextflow.config created in the setup instructions.1\nHere is a minimal example:\n\n./nextflow run nf-nest/examples/hello.nf -profile cluster \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/hello.nf` [boring_wegener] DSL2 - revision: 9d1a692a7e\n[5c/b3ec9c] Cached process &gt; hello\nHello world!",
+    "objectID": "01_intro.html#background",
+    "href": "01_intro.html#background",
+    "title": "Intro",
+    "section": "Background",
+    "text": "Background\n\nScientific workflow\nA scientific workflow is a directed acyclic graph where each node is a process and each edge between node \\(n\\) to \\(n'\\) denote that at least one output of process \\(n\\) is fed as an input to process \\(n'\\).\nHere is an example from a workflow covered later in this tutorial:\n\n\n\n\n\nflowchart TB\n    subgraph \" \"\n    v0[\"julia_env\"]\n    v1[\"toml\"]\n    v4[\"Channel.fromList\"]\n    v7[\"julia_env\"]\n    v8[\"toml\"]\n    v12[\"plot_script\"]\n    end\n    v2([instantiate_process])\n    v3([precompile])\n    v5([run_julia])\n    subgraph combine_workflow\n    v9([instantiate_process])\n    v10([precompile])\n    v11([combine_process])\n    end\n    v13([plot])\n    subgraph \" \"\n    v14[\"combined_csvs_folder\"]\n    v15[\" \"]\n    end\n    v6(( ))\n    v0 --&gt; v2\n    v1 --&gt; v2\n    v2 --&gt; v3\n    v3 --&gt; v5\n    v3 --&gt; v13\n    v4 --&gt; v5\n    v5 --&gt; v6\n    v7 --&gt; v9\n    v8 --&gt; v9\n    v9 --&gt; v10\n    v10 --&gt; v11\n    v6 --&gt; v11\n    v11 --&gt; v13\n    v12 --&gt; v13\n    v13 --&gt; v15\n    v13 --&gt; v14",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#managing-long-executions",
-    "href": "04_launch.html#managing-long-executions",
-    "title": "Launching an experiment",
-    "section": "Managing long executions",
-    "text": "Managing long executions\nWhen starting a job, the launching nextflow process needs to stay alive until the end of the last job. However, when the SSH connection is lost (e.g., you close your laptop), the nextflow process and hence child jobs will be killed. To avoid this, use screen or tmux which allows you to preserve a SSH session even if the SSH connection is closed.\n\nBasic instructions to start a long job\n\nTake note of which of the login nodes you are starting the job (e.g. in Sockeye, login01, login02 or login03).\nList existing tmux sessions with tmux ls\nCreate one with tmux or join last one with tmux a\nStart the nextflow.\nTo detach the tmux session ctrl-b followed by d\n\n\n\nLook at the status after being disconnected\n\nSSH in.\nIf you are in the wrong login node, use e.g., ssh login02 (follow 2FA instruction)\nReattach with tmux a\n\nFor more information on tmux, use this cheat sheet.\n\n\nCancelling a nextflow workflow\nPress ctrl-c only once. This will instruct nextflow to clean up children jobs: killing running jobs, as well as cancelling queued jobs.",
+    "objectID": "01_intro.html#more-information",
+    "href": "01_intro.html#more-information",
+    "title": "Intro",
+    "section": "More information",
+    "text": "More information\nBoth nextflow and Julia have excellent and extensive documentation.\n\nNexflow documentation\nJulia documentation",
     "crumbs": [
-      "Launch an experiment"
+      "Introduction"
     ]
   },
   {
-    "objectID": "04_launch.html#footnotes",
-    "href": "04_launch.html#footnotes",
-    "title": "Launching an experiment",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nIn the previous section (“local execution”), where we did not specify a -profile, the default profile named standard is used.↩︎",
-    "crumbs": [
-      "Launch an experiment"
-    ]
-  },
-  {
-    "objectID": "07_combine.html",
-    "href": "07_combine.html",
-    "title": "Combine outputs",
+    "objectID": "06_cross_product.html",
+    "href": "06_cross_product.html",
+    "title": "Job cross products",
     "section": "",
-    "text": "Now that we know how to run many jobs, the next question is how to combine the output of all these jobs to analyze it.",
+    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
     "crumbs": [
-      "Combine outputs"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "07_combine.html#overview",
-    "href": "07_combine.html#overview",
-    "title": "Combine outputs",
+    "objectID": "06_cross_product.html#overview",
+    "href": "06_cross_product.html#overview",
+    "title": "Job cross products",
     "section": "",
-    "text": "Now that we know how to run many jobs, the next question is how to combine the output of all these jobs to analyze it.",
+    "text": "Suppose you are interested in running a piece of code with many different outputs, with each execution performed on a different compute node of a cluster.\nThis page shows a streamlined way to do so.",
     "crumbs": [
-      "Combine outputs"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "07_combine.html#example",
-    "href": "07_combine.html#example",
-    "title": "Combine outputs",
+    "objectID": "06_cross_product.html#example",
+    "href": "06_cross_product.html#example",
+    "title": "Job cross products",
     "section": "Example",
-    "text": "Example\nWe will run Pigeons on the cross product formed by calling crossProduct(variables) with:\ndef variables = [\n    seed: 1..10,\n    n_chains: [10, 20], \n]\nSuppose we want to create a plot from the output of these 20 Julia processes.",
+    "text": "Example\nAs a toy example, suppose we want to compute all additions of the form a + b where a and b are integers from 1 to 3. In addition, we also want a * b. This means we will need \\(3 \\times 3 \\times 2\\) calculations.\nWe can characterize the inputs a the cross-product denoted \\(\\{1, 2, 3\\} \\times \\{1, 2, 3\\} \\times \\{+, *\\}\\).",
     "crumbs": [
-      "Combine outputs"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "07_combine.html#strategy",
-    "href": "07_combine.html#strategy",
-    "title": "Combine outputs",
-    "section": "Strategy",
-    "text": "Strategy\nEach Julia process will create a folder. Using a function, we will provide an automatic name to this folder encoding the inputs used (seed and n_chains). That name is provided by nf-nest’s filed() function. In that folder, we will\nput csv files.\nThen, once all Julia processes are done, another utilities from nf-nest, combine_csvs, will merge all CSVs while adding columns for the inputs (here, seed and n_chains).\nFinally, we will pass the merged CSVs to a plotting process.",
-    "crumbs": [
-      "Combine outputs"
-    ]
-  },
-  {
-    "objectID": "07_combine.html#nextflow-script",
-    "href": "07_combine.html#nextflow-script",
-    "title": "Combine outputs",
+    "objectID": "06_cross_product.html#nextflow-script",
+    "href": "06_cross_product.html#nextflow-script",
+    "title": "Job cross products",
     "section": "Nextflow script",
-    "text": "Nextflow script\n\n// includes are relative to the .nf file, should always start with ./ or ../\ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\ninclude { combine_csvs; } from '../combine.nf'\n\n// in contrast, file(..) is relative to `pwd`, use projectDir/ \n//   to make it relative to main .nf file, or moduleDir for the .nf file\ndef julia_env = file(moduleDir/'julia_env')\ndef plot_script = file(moduleDir/'plot.jl')\n\ndef variables = [\n    seed: 1..10,\n    n_chains: [10, 20], \n]\n\nworkflow {\n    compiled_env = instantiate(julia_env) | precompile\n    configs = crossProduct(variables)\n    combined = run_julia(compiled_env, configs) | combine_csvs\n    plot(compiled_env, plot_script, combined)\n}\n\nprocess run_julia {\n    input:\n        path julia_env \n        val config \n    output:\n        path \"${filed(config)}\"\n    \"\"\"\n    ${activate(julia_env)}\n\n    # run your code\n    using Pigeons \n    using CSV \n    pt = pigeons(\n            target = toy_mvn_target(1000), \n            n_chains = ${config.n_chains}, \n            seed = ${config.seed})\n\n    # organize output as follows:\n    #   - create a directory with name controlled by filed(config)\n    #     to keep track of input configuration\n    #   - put any number of CSV in there\n    mkdir(\"${filed(config)}\")\n    CSV.write(\"${filed(config)}/summary.csv\", pt.shared.reports.summary)\n    CSV.write(\"${filed(config)}/swap_prs.csv\", pt.shared.reports.swap_prs)\n    \"\"\"\n}\n\nprocess plot {\n    input:\n        path julia_env \n        path plot_script\n        path combined_csvs_folder \n    output:\n        path '*.png'\n        path combined_csvs_folder\n    publishDir \"${deliverables(workflow, params)}\", mode: 'copy', overwrite: true\n    \"\"\"\n    ${activate(julia_env)}\n\n    include(\"$plot_script\")\n    create_plots(\"$combined_csvs_folder\")\n    \"\"\"\n}",
+    "text": "Nextflow script\nThe script below will perform the following operations.\n\n// we use utilities in the nf-nest submodule\n// in user scripts, path would be './nf-nest/cross.nf' \ninclude { crossProduct; filed; deliverables } from '../cross.nf'\ninclude { instantiate; precompile; activate } from '../pkg.nf'\n\ndef variables = [\n    first: 1..3,\n    second: 1..3,\n    operation: [\"+\", \"*\"]\n]\n\n// specifies the order of operations\nworkflow {\n    // look at all combinations of variables\n    configs = crossProduct(variables)\n    // run Julia on 18 nodes!\n    run_julia(configs)\n\n    // equivalent syntax:\n    // crossProduct(variables) | run_julia\n}\n\nprocess run_julia {\n    debug true // by default, standard out is not shown, use this to show it\n    \n    // information used when submitting job to queue\n    time 2.min\n    cpus 1 \n    memory 5.GB\n\n    input:\n        val config \n    \"\"\"\n    ${activate()}\n    # ^ this is just a shortcut for:\n    #!/usr/bin/env julia --threads=1\n\n    @show ${config.first} ${config.operation} ${config.second}\n    \"\"\"\n}\n\nFor more information:\n\nRead on the nextflow scripting language\nRead on nextflow’s process block\nconfigs in the above is an example of a nextflow Channel\nMore on nextflow’s workflow block",
     "crumbs": [
-      "Combine outputs"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "07_combine.html#running-the-nextflow-script",
-    "href": "07_combine.html#running-the-nextflow-script",
-    "title": "Combine outputs",
-    "section": "Running the nextflow script",
-    "text": "Running the nextflow script\n\ncd experiment_repo\n./nextflow run nf-nest/examples/full.nf -profile cluster \n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/full.nf` [small_boltzmann] DSL2 - revision: a68c131baa\n[60/5b521f] Submitted process &gt; combine_workflow:instantiate_process\n[90/a3c5c4] Submitted process &gt; instantiate_process\n[f1/05f47e] Submitted process &gt; combine_workflow:precompile\n[31/1641f3] Submitted process &gt; precompile\n[85/3ab69c] Submitted process &gt; run_julia (11)\n[b3/421a4c] Submitted process &gt; run_julia (12)\n[ae/9af39b] Submitted process &gt; run_julia (15)\n[86/6a90e3] Submitted process &gt; run_julia (10)\n[f4/b1ad3b] Submitted process &gt; run_julia (4)\n[cf/eb486e] Submitted process &gt; run_julia (16)\n[ed/285ac0] Submitted process &gt; run_julia (8)\n[2c/f61efc] Submitted process &gt; run_julia (9)\n[db/729172] Submitted process &gt; run_julia (5)\n[94/f1828a] Submitted process &gt; run_julia (7)\n[2c/b1dad1] Submitted process &gt; run_julia (19)\n[e1/c153b0] Submitted process &gt; run_julia (3)\n[1c/1f6ead] Submitted process &gt; run_julia (2)\n[0b/572356] Submitted process &gt; run_julia (13)\n[56/614911] Submitted process &gt; run_julia (1)\n[8e/c15bbb] Submitted process &gt; run_julia (6)\n[35/60620a] Submitted process &gt; run_julia (14)\n[b1/80011d] Submitted process &gt; run_julia (18)\n[33/1c1c96] Submitted process &gt; run_julia (17)\n[8b/e192e5] Submitted process &gt; run_julia (20)\n[c2/4decb3] Submitted process &gt; combine_workflow:combine_process\n[95/035fbb] Submitted process &gt; plot",
+    "objectID": "06_cross_product.html#running-the-script",
+    "href": "06_cross_product.html#running-the-script",
+    "title": "Job cross products",
+    "section": "Running the script",
+    "text": "Running the script\nRunning it with the -profile cluster option will:\n\nbuild a cross-product from variables\nfor each one, automatically create submission scripts\nrun these Julia processes and show the standard out.\n\nFrom the command line, running the script is done as follows:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/many_jobs.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nWARN: It appears you have never run this project before -- Option `-resume` is ignored\nLaunching `nf-nest/examples/many_jobs.nf` [sad_agnesi] DSL2 - revision: aa082b1978\n[4f/0252f2] Submitted process &gt; run_julia (9)\n[d1/7252a5] Submitted process &gt; run_julia (6)\n[77/2b01c0] Submitted process &gt; run_julia (11)\n[9e/04fbdc] Submitted process &gt; run_julia (5)\n[64/e04736] Submitted process &gt; run_julia (3)\n[f4/222d52] Submitted process &gt; run_julia (4)\n[39/4aad19] Submitted process &gt; run_julia (8)\n[f6/45fadc] Submitted process &gt; run_julia (15)\n[e0/7ecd79] Submitted process &gt; run_julia (2)\n[c8/e159cb] Submitted process &gt; run_julia (1)\n[83/20cd0c] Submitted process &gt; run_julia (12)\n[c5/395a82] Submitted process &gt; run_julia (7)\n[ab/373b0e] Submitted process &gt; run_julia (13)\n[77/403b66] Submitted process &gt; run_julia (14)\n[ba/9339d4] Submitted process &gt; run_julia (16)\n[a5/7edb62] Submitted process &gt; run_julia (10)\n[ec/974205] Submitted process &gt; run_julia (17)\n[8d/36196b] Submitted process &gt; run_julia (18)\n1 * 3 = 3\n2 + 3 = 5\n2 + 2 = 4\n1 + 3 = 4\n1 + 2 = 3\n1 * 2 = 2\n2 * 1 = 2\n3 + 2 = 5\n1 * 1 = 1\n1 + 1 = 2\n2 * 3 = 6\n2 + 1 = 3\n3 + 1 = 4\n3 * 1 = 3\n3 * 2 = 6\n2 * 2 = 4\n3 + 3 = 6\n3 * 3 = 9",
     "crumbs": [
-      "Combine outputs"
+      "Job cross products"
     ]
   },
   {
-    "objectID": "07_combine.html#accessing-the-output",
-    "href": "07_combine.html#accessing-the-output",
-    "title": "Combine outputs",
-    "section": "Accessing the output",
-    "text": "Accessing the output\nEach nextflow process is associated with a unique work directory to ensure the processes do not interfere with each other. Here we cover two ways to quickly access these work directories.\n\nQuick inspection\nA quick way to find the output of a nextflow process that we just ran is to use:\ncd experiment_repo \nnf-nest/nf-open\nThis lists the work folders for the last nextflow job.\n\n\nOrganizing the output with a publishDir\nA better approach is to use the publishDir directive, combined with nf-nest’s deliverables() utility, as illustrated in the run_julia process above. This will automatically copy the output of the process associated with the directive in a sub-directory of experiment_repo/deliverables.\n\ntree experiment_repo/deliverables\n\nexperiment_repo/deliverables\n└── scriptName=full.nf___runName=small_boltzmann\n    ├── output\n    │   ├── summary.csv\n    │   └── swap_prs.csv\n    └── plot.png\n\n2 directories, 3 files\n\n\nHere the runName can be used with nextflow’s log command to obtain more information on the run.\n\ncd experiment_repo\n./nextflow log\n\nTIMESTAMP           DURATION    RUN NAME                STATUS  REVISION ID SESSION ID                              COMMAND                                                \n2024-11-11 15:44:22 3s          furious_chandrasekhar   OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf                 \n2024-11-11 15:44:28 7.5s        boring_wegener          OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf -profile cluster\n2024-11-11 15:45:26 47.7s       ridiculous_kimura       OK      869ec1e084  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/pkg.nf -profile cluster           \n2024-11-11 15:46:38 4m 9s       small_boltzmann         OK      a68c131baa  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/full.nf -profile cluster",
+    "objectID": "03_create-exp-repo.html",
+    "href": "03_create-exp-repo.html",
+    "title": "Creating an experiment repo",
+    "section": "",
+    "text": "We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.\nIt consists in a git repository with:\n\nthe nextflow executable and its configuration, nextflow.config;\na git submodule, nf-nest containing useful tools;\nyour .nf files and other supporting files.\n\nThis pages explains how to setup an experiment repo.",
     "crumbs": [
-      "Combine outputs"
+      "Create an experiment repo"
+    ]
+  },
+  {
+    "objectID": "03_create-exp-repo.html#overview",
+    "href": "03_create-exp-repo.html#overview",
+    "title": "Creating an experiment repo",
+    "section": "",
+    "text": "We use the term “experiment repo” for a git repository that contains the plumbing required for a numerical experiment.\nIt consists in a git repository with:\n\nthe nextflow executable and its configuration, nextflow.config;\na git submodule, nf-nest containing useful tools;\nyour .nf files and other supporting files.\n\nThis pages explains how to setup an experiment repo.",
+    "crumbs": [
+      "Create an experiment repo"
+    ]
+  },
+  {
+    "objectID": "03_create-exp-repo.html#location",
+    "href": "03_create-exp-repo.html#location",
+    "title": "Creating an experiment repo",
+    "section": "Location",
+    "text": "Location\nIn an HPC context, the experiment repo should be in a read/write location accessible to all nodes.\nFor example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/\nA second choice would be to use the scratch space, i.e. cd to a path of the form\nexport JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/",
+    "crumbs": [
+      "Create an experiment repo"
+    ]
+  },
+  {
+    "objectID": "03_create-exp-repo.html#sec-instructions",
+    "href": "03_create-exp-repo.html#sec-instructions",
+    "title": "Creating an experiment repo",
+    "section": "Instructions",
+    "text": "Instructions\nFor quick setup, run the following commands:\n\n# create a directory and cd into it\nmkdir experiment_repo && cd $_\n\ngit init\n\n# setup nextflow\ncurl -s https://get.nextflow.io | bash\n\n# add nf-nest utilities\ngit submodule add https://github.com/UBC-Stat-ML/nf-nest.git\n\n# copy template for nextflow configurations\ncp nf-nest/nextflow.config .",
+    "crumbs": [
+      "Create an experiment repo"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html",
+    "href": "05_pkg.html",
+    "title": "Managing Julia packages on HPC",
+    "section": "",
+    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#overview",
+    "href": "05_pkg.html#overview",
+    "title": "Managing Julia packages on HPC",
+    "section": "",
+    "text": "Installing a package in Julia includes two steps (1) downloading (2) pre-compiling. In a laptop, both are done in one shot using\n]\nactivate experiment_repo/julia_env\nadd NameOfPackage\nIn an HPC setup, step (2) requires computational effort hence is best done in compute node. However in some HPC setups such as Sockeye, compute nodes do not have internet access, so the process needs to be split. We cover here some utilities that facilitate this.",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#julia-environment",
+    "href": "05_pkg.html#julia-environment",
+    "title": "Managing Julia packages on HPC",
+    "section": "Julia environment",
+    "text": "Julia environment\nA Julia environment is a specification of all package dependencies and their versions.\nBy convention, we will store it in a directory called experiment_repo/julia_env.",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#adding-a-package",
+    "href": "05_pkg.html#adding-a-package",
+    "title": "Managing Julia packages on HPC",
+    "section": "Adding a package",
+    "text": "Adding a package\nThere are two syntaxes in Julia to install packages: the interactive Julia package manager or using programmatic Pkg syntax. We cover both below.\nIn both syntaxes, we first need to tell Julia which environment to use. This is called “activating” an environment.\n\nInteractive Julia package manager\nThe most common method is to use the interactive Julia package manager. To start it, type ] followed by enter.\nActivating is done with the activate keyword.\nYou can then add a package using the add command. The argument of add can be either a registered Julia package, for example we show here how to add the Pigeons package for MCMC sampling:\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\n]\nactivate experiment_repo/julia_env\nadd Pigeons\nAlternatively, the package can be a git repository, optionally with a specific commit/tag:\nadd Example@0.5\nadd Example#master\nadd Example#c37b675\nadd https://github.com/JuliaLang/Example.jl#master\nadd git@github.com:JuliaLang/Example.jl.git\nadd \"git@github.com:JuliaLang/Example.jl.git\"#master\nadd https://github.com/Company/MonoRepo:juliapkgs/Package.jl\nTo exit the interactive Julia package manager, type control-C.\n\n\nProgrammatic interface\nAlternatively, a programmatic interface is also available for scripting:\n\nENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0 # Hold off precompile since we are in login node\nusing Pkg \nPkg.activate(\"experiment_repo/julia_env\")\nPkg.add(\"Pigeons\")",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#precompilation-on-hpc",
+    "href": "05_pkg.html#precompilation-on-hpc",
+    "title": "Managing Julia packages on HPC",
+    "section": "Precompilation on HPC",
+    "text": "Precompilation on HPC\nOnce we have downloaded the packages in the login node, we now turn to the task of performing pre-compilation.\n\ncd experiment_repo \n./nextflow run nf-nest/pkg.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/pkg.nf` [reverent_curran] DSL2 - revision: fc0374e695\n[43/8256a8] Submitted process &gt; instantiate_process\n[02/7c263d] Submitted process &gt; precompile\n\n\nOptionally, you can append an argument to specify the number of threads to request and use during pre-compilation: e.g. add --nPrecompileThreads 20 to request 20 threads instead of the default of 10.",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#testing-your-julia-environment-interactively",
+    "href": "05_pkg.html#testing-your-julia-environment-interactively",
+    "title": "Managing Julia packages on HPC",
+    "section": "Testing your Julia environment interactively",
+    "text": "Testing your Julia environment interactively\nIn the code above, we have added the package Pigeons as an example.\nTo interactively test an installed package, simply activate the environment from a Julia session:\n\nusing Pkg\nPkg.activate(\"experiment_repo/julia_env\")\n\nusing Pigeons\npigeons(target = toy_mvn_target(1000))",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "05_pkg.html#more-information",
+    "href": "05_pkg.html#more-information",
+    "title": "Managing Julia packages on HPC",
+    "section": "More information",
+    "text": "More information\nSee Pkg.jl documentation.",
+    "crumbs": [
+      "Add Julia packages on HPC"
+    ]
+  },
+  {
+    "objectID": "08_containers.html",
+    "href": "08_containers.html",
+    "title": "Containers",
+    "section": "",
+    "text": "Containers such as Docker and apptainer address two issues:\n\nmaking pipeline reproducible,\nwe do not have root access in HPC.",
+    "crumbs": [
+      "Containers"
+    ]
+  },
+  {
+    "objectID": "08_containers.html#overview",
+    "href": "08_containers.html#overview",
+    "title": "Containers",
+    "section": "",
+    "text": "Containers such as Docker and apptainer address two issues:\n\nmaking pipeline reproducible,\nwe do not have root access in HPC.",
+    "crumbs": [
+      "Containers"
+    ]
+  },
+  {
+    "objectID": "08_containers.html#using-an-existing-container",
+    "href": "08_containers.html#using-an-existing-container",
+    "title": "Containers",
+    "section": "Using an existing container",
+    "text": "Using an existing container\nIn the file nextflow.config provided in nf-nest we provide an example of container documentation:\n\nhead -n 28 experiment_repo/nextflow.config\n\nprofiles {\n    standard {  \n        docker.enabled = true\n        process {\n            withLabel:containerized {\n                container = 'alexandrebouchardcote/default:0.1.6'\n            }\n        }\n    }\n    cluster {\n        apptainer.enabled = true\n        process {\n            scratch = true\n            executor = 'slurm'\n            cpus = 1\n            memory = 4.GB\n            time = '2h'\n            clusterOptions = \"--nodes=1 --account $ALLOCATION_CODE\"\n            withLabel:containerized {\n                container = 'alexandrebouchardcote/default:0.1.6'\n                module = 'apptainer'\n            }\n            withLabel:gpu {\n                clusterOptions = \"--nodes=1 --account ${ALLOCATION_CODE}-gpu --gpus 1\"\n            }\n        }\n    }\n}\n\n\nThere are two profiles, the default one using Docker, and the cluster one, using apptainer. We define a label for this container, which we call here containerized.\nTo instruct one of the process in the workflow to use that container, add the directive label 'containerized'.\nHere is an example of a process to compile and run a Stan program, where Stan is part of the above container:\n\nprocess compile_stan {\n    label 'containerized' \n\n    input:\n        path stan_file\n    output:\n        path \"${stan_file.baseName}\"\n        \n    \"\"\"\n    # name of stan file without extension\n    base_name=`basename $stan_file .stan`\n\n    # need to run Stan's make file from the CMDSTAN dir\n    CUR=`pwd`\n    cd \\$CMDSTAN\n    make \\$CUR/\\$base_name\n    \"\"\"\n}\n\nprocess run_stan {\n    label 'containerized' \n\n    input:\n        path stan_exec \n        path data\n\n    \"\"\"\n    ./$stan_exec sample \\\n        data file=$data \\\n        output file=samples.csv \n\n    # Compute ESS from Stan's stansummary utility\n    \\$CMDSTAN/bin/stansummary samples.csv --csv_filename ess.csv\n    \"\"\"\n}\n\nHere is an example workflow using these containerized processes:\n\ninclude { compile_stan; run_stan; } from \"./stan.nf\"\n\ndef stanModel = file(\"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.stan\")\ndef data = file(\"https://raw.githubusercontent.com/Julia-Tempering/Pigeons.jl/refs/heads/main/examples/stan/bernoulli.data.json\")\n\nworkflow {\n    compiled = compile_stan(stanModel)\n    run_stan(compiled, data)\n}\n\nTo run it:\n\ncd experiment_repo\n./nextflow run nf-nest/examples/stan_example.nf -profile cluster\n\nN E X T F L O W  ~  version 24.10.0\nLaunching `nf-nest/examples/stan_example.nf` [drunk_gautier] DSL2 - revision: 8cef9f29d6\nWARN: Apptainer cache directory has not been defined -- Remote image will be stored in the path: /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity -- Use the environment variable NXF_APPTAINER_CACHEDIR to specify a different location\nPulling Apptainer image docker://alexandrebouchardcote/default:0.1.6 [cache /arc/burst/st-alexbou-1/abc/nf-nest-doc/experiment_repo/work/singularity/alexandrebouchardcote-default-0.1.6.img]\n[ed/1e5ab8] Submitted process &gt; compile_stan\n[3e/f8706a] Submitted process &gt; run_stan",
+    "crumbs": [
+      "Containers"
+    ]
+  },
+  {
+    "objectID": "08_containers.html#creating-containers",
+    "href": "08_containers.html#creating-containers",
+    "title": "Containers",
+    "section": "Creating containers",
+    "text": "Creating containers\nThere are many reference online for creating containers in general, but much less on creating cross-platform containers working on both x86 and Apple Silicon.\nWe have created some script to help doing this, see code and instructions at this page.",
+    "crumbs": [
+      "Containers"
     ]
   }
 ]

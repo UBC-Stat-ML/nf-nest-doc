@@ -187,6 +187,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Containers</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_gpu.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU programming</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -329,33 +335,33 @@ put csv files.</p>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/full.nf` [small_boltzmann] DSL2 - revision: a68c131baa
-[60/5b521f] Submitted process &gt; combine_workflow:instantiate_process
-[90/a3c5c4] Submitted process &gt; instantiate_process
-[f1/05f47e] Submitted process &gt; combine_workflow:precompile
-[31/1641f3] Submitted process &gt; precompile
-[85/3ab69c] Submitted process &gt; run_julia (11)
-[b3/421a4c] Submitted process &gt; run_julia (12)
-[ae/9af39b] Submitted process &gt; run_julia (15)
-[86/6a90e3] Submitted process &gt; run_julia (10)
-[f4/b1ad3b] Submitted process &gt; run_julia (4)
-[cf/eb486e] Submitted process &gt; run_julia (16)
-[ed/285ac0] Submitted process &gt; run_julia (8)
-[2c/f61efc] Submitted process &gt; run_julia (9)
-[db/729172] Submitted process &gt; run_julia (5)
-[94/f1828a] Submitted process &gt; run_julia (7)
-[2c/b1dad1] Submitted process &gt; run_julia (19)
-[e1/c153b0] Submitted process &gt; run_julia (3)
-[1c/1f6ead] Submitted process &gt; run_julia (2)
-[0b/572356] Submitted process &gt; run_julia (13)
-[56/614911] Submitted process &gt; run_julia (1)
-[8e/c15bbb] Submitted process &gt; run_julia (6)
-[35/60620a] Submitted process &gt; run_julia (14)
-[b1/80011d] Submitted process &gt; run_julia (18)
-[33/1c1c96] Submitted process &gt; run_julia (17)
-[8b/e192e5] Submitted process &gt; run_julia (20)
-[c2/4decb3] Submitted process &gt; combine_workflow:combine_process
-[95/035fbb] Submitted process &gt; plot</code></pre>
+Launching `nf-nest/examples/full.nf` [gloomy_bardeen] DSL2 - revision: a68c131baa
+[e6/bd72b0] Submitted process &gt; combine_workflow:instantiate_process
+[90/17eb99] Submitted process &gt; instantiate_process
+[25/e00629] Submitted process &gt; precompile
+[c6/fe533e] Submitted process &gt; combine_workflow:precompile
+[d7/6278f0] Submitted process &gt; run_julia (1)
+[95/26225c] Submitted process &gt; run_julia (12)
+[f4/c2cfc4] Submitted process &gt; run_julia (11)
+[72/daab8f] Submitted process &gt; run_julia (15)
+[13/c967f1] Submitted process &gt; run_julia (2)
+[1b/620546] Submitted process &gt; run_julia (6)
+[58/4cf41c] Submitted process &gt; run_julia (7)
+[88/dc6041] Submitted process &gt; run_julia (10)
+[ec/0b8ff7] Submitted process &gt; run_julia (3)
+[85/3f52e3] Submitted process &gt; run_julia (13)
+[7a/da04ae] Submitted process &gt; run_julia (8)
+[65/94d65f] Submitted process &gt; run_julia (16)
+[e5/613077] Submitted process &gt; run_julia (5)
+[4b/8734be] Submitted process &gt; run_julia (14)
+[d6/0b5cc7] Submitted process &gt; run_julia (4)
+[60/5c6106] Submitted process &gt; run_julia (9)
+[44/070feb] Submitted process &gt; run_julia (18)
+[bb/a2be64] Submitted process &gt; run_julia (17)
+[5c/c1f32d] Submitted process &gt; run_julia (20)
+[f3/9bf9d2] Submitted process &gt; run_julia (19)
+[66/ec5b2f] Submitted process &gt; combine_workflow:combine_process
+[6d/e06477] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 </section>
@@ -376,7 +382,7 @@ Launching `nf-nest/examples/full.nf` [small_boltzmann] DSL2 - revision: a68c131b
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>experiment_repo/deliverables
-└── scriptName=full.nf___runName=small_boltzmann
+└── scriptName=full.nf___runName=gloomy_bardeen
     ├── output
     │&nbsp;&nbsp; ├── summary.csv
     │&nbsp;&nbsp; └── swap_prs.csv
@@ -390,11 +396,11 @@ Launching `nf-nest/examples/full.nf` [small_boltzmann] DSL2 - revision: a68c131b
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TIMESTAMP           DURATION    RUN NAME                STATUS  REVISION ID SESSION ID                              COMMAND                                                
-2024-11-11 15:44:22 3s          furious_chandrasekhar   OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf                 
-2024-11-11 15:44:28 7.5s        boring_wegener          OK      9d1a692a7e  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/hello.nf -profile cluster
-2024-11-11 15:45:26 47.7s       ridiculous_kimura       OK      869ec1e084  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/pkg.nf -profile cluster           
-2024-11-11 15:46:38 4m 9s       small_boltzmann         OK      a68c131baa  5dc94884-05a2-4290-8557-75299f3dafa7    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
+<pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                
+2024-11-11 20:52:00 3.1s        insane_wegener      OK      9d1a692a7e  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/hello.nf                 
+2024-11-11 20:52:07 7.4s        voluminous_banach   OK      9d1a692a7e  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/hello.nf -profile cluster
+2024-11-11 20:53:06 47.7s       reverent_curran     OK      fc0374e695  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/pkg.nf -profile cluster           
+2024-11-11 20:54:16 5m 49s      gloomy_bardeen      OK      a68c131baa  9579116d-1e95-4a32-b13a-14c9f7370dee    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
 </div>
 </div>
 
