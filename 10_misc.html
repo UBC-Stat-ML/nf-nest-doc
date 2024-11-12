@@ -212,6 +212,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#process-parameters" id="toc-process-parameters" class="nav-link active" data-scroll-target="#process-parameters">Process parameters</a></li>
   <li><a href="#dry-runs" id="toc-dry-runs" class="nav-link" data-scroll-target="#dry-runs">Dry runs</a></li>
   <li><a href="#what-to-commit" id="toc-what-to-commit" class="nav-link" data-scroll-target="#what-to-commit">What to commit?</a></li>
+  <li><a href="#updating-code" id="toc-updating-code" class="nav-link" data-scroll-target="#updating-code">Updating code</a>
+  <ul class="collapse">
+  <li><a href="#lightweight-code" id="toc-lightweight-code" class="nav-link" data-scroll-target="#lightweight-code">Lightweight code</a></li>
+  <li><a href="#library" id="toc-library" class="nav-link" data-scroll-target="#library">Library</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -420,10 +425,134 @@ Launching `nf-nest/examples/dry_run.nf` [condescending_curie] DSL2 - revision: c
 <p>Standard git guidelines suggest to never commit “derived files”. We recommend to deviate slightly from git conventions and commit a bit more than just strict minimum:</p>
 <ul>
 <li><code>Manifest.toml</code> is derived from <code>Project.toml</code>, but commit it, as it contains precise version information needed for reproducibility (in contrast to package developers, who would only commit <code>Project.toml</code>, but numerical experiments is not the same as a package!)</li>
-<li>Once there are experiments you plan to include in a paper, commit the corresponding sub-folder of deliverable, <strong>including the CSV files used to produce that figure</strong>. This way the tex repo can just use the experiment repo as a submodule and the authors can compile the paper right away. Having the CSV there also mean that plot esthetics can be quickly tweaked later on (e.g., the night before a talk).</li>
+<li>Once there are experiments you plan to include in a paper, commit the corresponding sub-folder of <code>deliverables</code>, <strong>including the CSV files used to produce that figure</strong>. This way the tex repo can just use the experiment repo as a submodule and the authors can compile the paper right away. Having the CSV there also mean that plot esthetics can be quickly tweaked later on (e.g., the night before a talk).</li>
 </ul>
+</section>
+<section id="updating-code" class="level2">
+<h2 class="anchored" data-anchor-id="updating-code">Updating code</h2>
+<p>Numerical experiment are often based on code you are developing along the way. When the code is updated, with a bit of organization, nextflow can figure out which subset of the workflow needs to be re-run. We present two models for doing this: one for lightweight code such as plotting/analysis, and one for more substantial code, e.g.&nbsp;a method you are developing.</p>
+<section id="lightweight-code" class="level3">
+<h3 class="anchored" data-anchor-id="lightweight-code">Lightweight code</h3>
+<p>Include the <code>.jl</code> file in the nextflow repo, feed it to the node as input, and use a Julia <code>include()</code> on it. We have already used that pattern for the <code>plot</code> node in <a href="./07_combine.html">an earlier example</a>.</p>
+<p>If you have several Julia files, put them in a directory, and use the syntax:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>include <span class="op">{</span> activate<span class="op">;</span> <span class="op">}</span> from <span class="st">"../pkg.nf"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> julia_files <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>moduleDir<span class="op">/</span><span class="st">"julia/*.jl"</span><span class="op">)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>workflow <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">run_julia</span><span class="op">(</span>julia_files<span class="op">)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>process run_julia <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    debug <span class="kw">true</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        file julia_files</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">()</span><span class="ss">}</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="st">    include("a.jl")</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="st">    include("b.jl")</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/includes.nf </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>N E X T F L O W  ~  version 24.10.0
+Launching `nf-nest/examples/includes.nf` [shrivelled_engelbart] DSL2 - revision: f263a35a46
+[9a/1a9b97] Cached process &gt; run_julia
+hello
+world</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Passing a directory as input (rather than a collection of files as done above), is not ideal in this context. This is because nextflow does not currently recurse inside the directory to compute the checksum used to determine if the cache can be used. Recall that in unix, the change date of a directory only changes when a file is deleted or added under it, <em>and not when a file under it is edited!</em></p>
+</div>
+</div>
+</section>
+<section id="library" class="level3">
+<h3 class="anchored" data-anchor-id="library">Library</h3>
+<p>If the code you include is more complex, and/or might be used outside of the context of one nextflow script, it is better to package it.</p>
+<p>In Julia, creating a package is very simple and it can be published right away and for free on github: see <a href="https://julialang.org/contribute/developing_package/">this tutorial</a>.</p>
+<p>For example, we wrote a small Julia package, <a href="https://github.com/UBC-Stat-ML/CombineCSVs">CombineCSV.jl</a> to perform the CSV combination in <a href="./07_combine.html">this earlier section</a>.</p>
+<p>To add or update, you can use a script of that form:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cn">ENV</span>[<span class="st">"JULIA_PKG_PRECOMPILE_AUTO"</span>]<span class="op">=</span><span class="fl">0</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">activate</span>(<span class="st">"julia_env"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">add</span>(url <span class="op">=</span> <span class="st">"https://github.com/UBC-Stat-ML/CombineCSVs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>where you would replace the URL by the git repo you are using. Note that <code>add</code> will also update to the head of the main branch.</p>
+<p>This updates the “Manifest.toml” file which in turns signal our “pkg.jl” <code>instantiate</code> utility that it needs to be reran by nextflow:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode groovy code-with-copy"><code class="sourceCode groovy"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>params<span class="op">.</span>nPrecompileThreads <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>params<span class="op">.</span>julia_env <span class="op">=</span> <span class="st">'julia_env'</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>julia_env <span class="op">=</span> <span class="fu">file</span><span class="op">(</span>params<span class="op">.</span>julia_env<span class="op">)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>julia_env<span class="op">.</span><span class="fu">mkdir</span><span class="op">()</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Can be used as standalone, but typically used inside a user nf file</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>workflow  <span class="op">{</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">instantiate</span><span class="op">(</span>julia_env<span class="op">)</span> <span class="op">|</span> precompile</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> <span class="fu">instantiate</span><span class="op">(</span>julia_env<span class="op">)</span> <span class="op">{</span> <span class="fu">instantiate_process</span><span class="op">(</span>julia_env<span class="op">,</span> <span class="fu">file</span><span class="op">(</span>julia_env<span class="op">/</span><span class="st">"Manifest.toml"</span><span class="op">))}</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>process instantiate_process <span class="op">{</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    executor <span class="st">'local'</span> <span class="co">// we need internet access</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    scratch <span class="kw">false</span> <span class="co">// we want changes in Manifest.toml to be saved</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span> </span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        path julia_env</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        path toml <span class="co">// needed for correct cache behaviour under updates</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>        path julia_env</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">)</span><span class="ss">}</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="st">    ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="st">    using Pkg</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="st">    Pkg.instantiate()</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>process precompile <span class="op">{</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    input<span class="op">:</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>        path julia_env</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>    output<span class="op">:</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>        path julia_env</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>    cpus params<span class="op">.</span>nPrecompileThreads </span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>    memory <span class="fl">15.</span>GB</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="ss">${</span><span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">,</span> params<span class="op">.</span>nPrecompileThreads<span class="op">)</span><span class="ss">}</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="st">    using Pkg </span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="st">    Pkg.offline(true) </span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="st">    Pkg.precompile()</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="co">// Start Julia and with the provided environment and optionally, number of threads (1 by default) </span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="co">// Needs to be the very first line of the process script</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> <span class="fu">activate</span><span class="op">(</span>julia_env<span class="op">,</span> nThreads <span class="op">=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"#!/usr/bin/env julia --threads=</span><span class="ss">${</span>nThreads<span class="ss">}</span><span class="st"> --project=</span><span class="ss">$julia_env</span><span class="st">"</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="dt">def</span> <span class="fu">activate</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"#!/usr/bin/env julia --threads=1"</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
