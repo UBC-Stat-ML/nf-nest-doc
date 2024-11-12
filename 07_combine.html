@@ -341,33 +341,33 @@ put csv files.</p>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/full.nf` [agitated_knuth] DSL2 - revision: a68c131baa
-[6d/3357a5] Submitted process &gt; combine_workflow:instantiate_process
-[25/d08519] Submitted process &gt; instantiate_process
-[bb/03d46d] Submitted process &gt; combine_workflow:precompile
-[bb/605315] Submitted process &gt; precompile
-[fa/aa7751] Submitted process &gt; run_julia (9)
-[7b/150dd2] Submitted process &gt; run_julia (8)
-[cd/7a1c39] Submitted process &gt; run_julia (2)
-[df/ffce39] Submitted process &gt; run_julia (13)
-[c8/23f9a2] Submitted process &gt; run_julia (12)
-[b6/ed34c6] Submitted process &gt; run_julia (4)
-[7f/32c560] Submitted process &gt; run_julia (5)
-[23/dca8ec] Submitted process &gt; run_julia (15)
-[3e/bd5153] Submitted process &gt; run_julia (14)
-[8f/1b5deb] Submitted process &gt; run_julia (10)
-[57/f522b3] Submitted process &gt; run_julia (6)
-[60/eb9c28] Submitted process &gt; run_julia (11)
-[9c/ce18ab] Submitted process &gt; run_julia (1)
-[13/599d3d] Submitted process &gt; run_julia (7)
-[cb/d8f2f4] Submitted process &gt; run_julia (3)
-[e0/fad42d] Submitted process &gt; run_julia (16)
-[34/e101c3] Submitted process &gt; run_julia (17)
-[3b/a775ca] Submitted process &gt; run_julia (18)
-[90/4f63ff] Submitted process &gt; run_julia (20)
-[65/b68f71] Submitted process &gt; run_julia (19)
-[4a/d5b369] Submitted process &gt; combine_workflow:combine_process
-[21/1bfa99] Submitted process &gt; plot</code></pre>
+Launching `nf-nest/examples/full.nf` [intergalactic_jepsen] DSL2 - revision: a68c131baa
+[9c/0659ed] Submitted process &gt; combine_workflow:instantiate_process
+[71/d2fadf] Submitted process &gt; instantiate_process
+[ce/f1a696] Submitted process &gt; combine_workflow:precompile
+[4d/72b110] Submitted process &gt; precompile
+[42/0732cc] Submitted process &gt; run_julia (9)
+[5e/81171f] Submitted process &gt; run_julia (1)
+[c5/1ccbfe] Submitted process &gt; run_julia (3)
+[d4/228929] Submitted process &gt; run_julia (4)
+[2b/2baf59] Submitted process &gt; run_julia (14)
+[8c/2bb063] Submitted process &gt; run_julia (15)
+[d5/5001bb] Submitted process &gt; run_julia (13)
+[56/de7ec7] Submitted process &gt; run_julia (7)
+[ab/d18893] Submitted process &gt; run_julia (11)
+[76/fc81a9] Submitted process &gt; run_julia (5)
+[69/6f13e4] Submitted process &gt; run_julia (10)
+[28/fa731e] Submitted process &gt; run_julia (2)
+[61/f7b16b] Submitted process &gt; run_julia (12)
+[8e/3df7d5] Submitted process &gt; run_julia (16)
+[d3/fe1273] Submitted process &gt; run_julia (6)
+[56/f5fc6a] Submitted process &gt; run_julia (8)
+[ee/683820] Submitted process &gt; run_julia (17)
+[58/7fa150] Submitted process &gt; run_julia (18)
+[28/2a8382] Submitted process &gt; run_julia (19)
+[c2/f5b56b] Submitted process &gt; run_julia (20)
+[52/031bf9] Submitted process &gt; combine_workflow:combine_process
+[c0/9912ef] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 </section>
@@ -388,7 +388,7 @@ Launching `nf-nest/examples/full.nf` [agitated_knuth] DSL2 - revision: a68c131ba
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> experiment_repo/deliverables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>experiment_repo/deliverables
-└── scriptName=full.nf___runName=agitated_knuth
+└── scriptName=full.nf___runName=intergalactic_jepsen
     ├── output
     │&nbsp;&nbsp; ├── summary.csv
     │&nbsp;&nbsp; └── swap_prs.csv
@@ -402,11 +402,11 @@ Launching `nf-nest/examples/full.nf` [agitated_knuth] DSL2 - revision: a68c131ba
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                
-2024-11-12 07:05:30 3.2s        nostalgic_carson    OK      9d1a692a7e  317a6835-37ee-4f54-9d9f-b0df69f57bbd    nextflow run nf-nest/examples/hello.nf                 
-2024-11-12 07:05:36 7.6s        evil_ardinghelli    OK      9d1a692a7e  317a6835-37ee-4f54-9d9f-b0df69f57bbd    nextflow run nf-nest/examples/hello.nf -profile cluster
-2024-11-12 07:06:32 1m 22s      stupefied_goldstine OK      fc0374e695  317a6835-37ee-4f54-9d9f-b0df69f57bbd    nextflow run nf-nest/pkg.nf -profile cluster           
-2024-11-12 07:08:17 4m 33s      agitated_knuth      OK      a68c131baa  317a6835-37ee-4f54-9d9f-b0df69f57bbd    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
+<pre><code>TIMESTAMP           DURATION    RUN NAME                STATUS  REVISION ID SESSION ID                              COMMAND                                                
+2024-11-12 09:04:09 3.5s        grave_allen             OK      9d1a692a7e  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/hello.nf                 
+2024-11-12 09:04:16 6.9s        romantic_solvay         OK      9d1a692a7e  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/hello.nf -profile cluster
+2024-11-12 09:05:11 1m 13s      golden_shaw             OK      fc0374e695  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/pkg.nf -profile cluster           
+2024-11-12 09:06:48 3m 8s       intergalactic_jepsen    OK      a68c131baa  bf02b0fb-fa7d-4171-88a3-e89239ee4248    nextflow run nf-nest/examples/full.nf -profile cluster </code></pre>
 </div>
 </div>
 

@@ -254,9 +254,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/pkg_gpu.nf </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/pkg_gpu.nf` [insane_monod] DSL2 - revision: 713b74ac4a
-[0a/d32c39] Submitted process &gt; instantiate_process
-[9a/f339af] Submitted process &gt; precompile_gpu</code></pre>
+Launching `nf-nest/pkg_gpu.nf` [hopeful_turing] DSL2 - revision: 713b74ac4a
+[b6/0ba7e0] Submitted process &gt; instantiate_process
+[70/2ce6ba] Submitted process &gt; precompile_gpu</code></pre>
 </div>
 </div>
 </section>
@@ -303,16 +303,16 @@ Launching `nf-nest/pkg_gpu.nf` [insane_monod] DSL2 - revision: 713b74ac4a
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/gpu.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>N E X T F L O W  ~  version 24.10.0
-Launching `nf-nest/examples/gpu.nf` [sick_legentil] DSL2 - revision: 9be41cea49
-[70/537eb2] Submitted process &gt; instantiate_process
-[d4/f4b844] Submitted process &gt; precompile_gpu
-[05/4b36e9] Submitted process &gt; run_julia
+Launching `nf-nest/examples/gpu.nf` [thirsty_mahavira] DSL2 - revision: 9be41cea49
+[b6/49dd3e] Submitted process &gt; instantiate_process
+[80/583246] Submitted process &gt; precompile_gpu
+[fc/7402e7] Submitted process &gt; run_julia
 CPU
- 15.295592 seconds (4.79 M allocations: 517.701 MiB, 4.03% gc time, 18.96% compilation time)
- 12.138829 seconds (2 allocations: 190.735 MiB, 0.06% gc time)
+ 13.046295 seconds (4.79 M allocations: 517.701 MiB, 3.56% gc time, 17.49% compilation time)
+ 10.582634 seconds (2 allocations: 190.735 MiB, 0.10% gc time)
 GPU
-  1.972740 seconds (1.67 M allocations: 107.375 MiB, 95.51% compilation time)
-  0.000784 seconds (50 allocations: 1.172 KiB)
+  1.535394 seconds (1.67 M allocations: 107.375 MiB, 96.04% compilation time)
+  0.000591 seconds (50 allocations: 1.172 KiB)
 CUDA runtime 12.5, artifact installation
 CUDA driver 12.6
 NVIDIA driver 550.90.12
@@ -339,7 +339,7 @@ Preferences:
 - CUDA_Runtime_jll.version: 12.5
 
 1 device:
-  0: Tesla V100-SXM2-16GB (sm_70, 15.171 GiB / 16.000 GiB available)</code></pre>
+  0: Tesla V100-SXM2-32GB (sm_70, 31.137 GiB / 32.000 GiB available)</code></pre>
 </div>
 </div>
 </section>
