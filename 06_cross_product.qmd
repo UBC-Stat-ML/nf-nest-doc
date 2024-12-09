@@ -75,3 +75,13 @@ Running this
 cd experiment_repo
 ./nextflow run nf-nest/examples/filter.nf  
 ```
+
+## Log scales
+
+To create a list of parameters in log scale, use:
+
+```groovy
+(0..2).collect{ i -> Math.pow(2.0, i)}
+```
+
+This will return `2.0^0, 2.0^1, 2.0^2`. 
