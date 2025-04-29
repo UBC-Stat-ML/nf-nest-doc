@@ -128,7 +128,13 @@ not propagated to a child process.
 One annoyance with this strategy is that after an update of the PATH variable, if you have
 several windows open, you may have to logout and log back in for the change to take effect. 
 Moreover, even if you disconnect to VSCode, it maintains a process on the server, so 
-you have to [kill that server](https://stackoverflow.com/questions/56892931/how-to-kill-vscode-remote-services-on-ubuntu-host), log out, and then log back in.
+you have to kill that server using
+
+```
+ps aux | grep .vscode-server | awk '{print $2}' | xargs kill
+```
+
+then log out, and then log back in.
 
 
 ## Git
