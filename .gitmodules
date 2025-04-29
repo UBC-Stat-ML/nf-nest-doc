@@ -1,0 +1,6 @@
+[submodule "src/experiment_repo/nf-nest-doc"]
+	path = src/experiment_repo/nf-nest-doc
+	url = https://github.com/UBC-Stat-ML/nf-nest-doc.git
+[submodule "nf-nest"]
+	path = nf-nest
+	url = https://github.com/UBC-Stat-ML/nf-nest.git
