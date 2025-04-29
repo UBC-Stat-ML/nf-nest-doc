@@ -48,30 +48,68 @@ the root of your project. VS Code is also able to manage your github
 authentification.
 
 
+## Understanding bash
+
+When you login to HPC, it starts a process allowing you to interact with the 
+server in a scripting language, which is typically *bash*. 
+
+It is a good investment to learn the basics of bash. See the 
+[software carpentry open source tutorial](https://swcarpentry.github.io/shell-novice/). 
+
+
+## Understanding environment variables
+
+Any UNIX process owns a special set of global variables called its environment variables. 
+Each variable holds a string, possibly empty. 
+
+An important convention is the `PATH` environment variable holding a `:`-separated list of paths 
+where executable such as `julia` or `python` will be searched for. 
+
+For example, in a bash process, to display the value of an environment variable called 
+`MY_ENV_VAR`, use 
+
+```
+echo $MY_ENV_VAR
+```
+
+In a Julia process:
+
+```
+ENV["MY_ENV_VAR"]
+```
+
+When a process starts a child process, the parent process decides what the 
+child's environment variable will be. 
+
+For example, consider what happens when you start Julia from bash. It is 
+bash that will decide. Bash does it as follows: it uses the command `export` to 
+mark a variable as something we want to propagate to children. This is why 
+you will see `export PATH` in a start up file (next section). 
+
+Nextflow will take a different approach than bash: the environment variables 
+are [specified explicitly](https://nextflow.io/docs/latest/process.html#input-environment-variables-env) to ensure better reproducibility. 
+
+
 ## Understanding start up files
 
-Bash (and its cousins such as zsh) are used in two main ways:
+Bash is used in several different ways, with terminology for each kind. 
 
-1. When you login via SSH.
-2. After being logged in, bash can be called by another process (e.g. bash, VS Code). 
+In one axis: bash is called either on login or not:
 
-VS Code internally uses `1` once but hides it, and when a 
-new terminal in VS Code is opened, it is done via `2`. 
+1. `login`: when you login to a machine (via SSH, or start-up a linux machine).
+2. `non-login` after being logged in, bash can be called by another process (e.g. bash, VS Code). 
 
-When bash is started with `1`, the file `~/.bash_profile` is called. 
-When bash is started with `2`, the file `~/.bashrc` is **sometimes** called.[^1]
+In another axis: bash is called either:
 
-[^1]: We emphasize "sometimes" here: for example, when nextflow calls bash, to make things 
-    reproducible, it does **not** automatically pass environment variables. They 
-    have to be set explicitly using [input environment variables](https://www.nextflow.io/docs/latest/process.html#input-environment-variables-env).
-    More generally, any parent process is free to decide which environment variables to 
-    propagate to its child. Bash uses `export` to make this decision automatically when 
-    it starts a child. Other languages such as nextflow make different decisions.
+1. `interactively`: when a user will interact with the process
+2. `non-interactively`: when it is another program in control. 
 
-Since we do `2` more frequently, we want it to be fast. It is OK if some operations 
-in `1` are a bit slow because it is less frequently called.
+The following files will be sourced automatically [in the following circumstances](https://stackoverflow.com/questions/415403/whats-the-difference-between-bashrc-bash-profile-and-environment): 
 
-Typically anything in `2` we want it to happen in `1` as well. So use this:
+- `~/.bashrc`, loaded when the shell is interactive and non-login,
+- `~/.bash_profile`, loaded for login shell.
+
+A common pattern is to use the following in `~/.bash_profile`
 
 ```bash 
 # put that in .bash_profile so that anything in .bashrc also gets loaded
@@ -80,11 +118,17 @@ if [ -f ~/.bashrc ]; then
 fi
 ```
 
-Recall that any environment variables with `export` are passed in to child process. 
-So no need to set them every time in `2`, instead you can set them once and for all in `1` 
-(but then you need to login again for this take effect).
+and then to put environment variables in `~/.bash_profile` and aliases 
+in `~/.bashrc`. 
 
-On the other hand, aything with `alias`, `module`, etc, is not propagated. 
+Recall that any environment variables with `export` are passed in to child process. 
+So no need to set them in non-login shells. On the other hand, anything with `alias` is 
+not propagated to a child process.
+
+One annoyance with this strategy is that after an update of the PATH variable, if you have
+several windows open, you may have to logout and log back in for the change to take effect. 
+Moreover, even if you disconnect to VSCode, it maintains a process on the server, so 
+you have to [kill that server](https://stackoverflow.com/questions/56892931/how-to-kill-vscode-remote-services-on-ubuntu-host), log out, and then log back in.
 
 
 ## Git
