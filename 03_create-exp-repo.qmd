@@ -28,13 +28,13 @@ In an HPC context, the experiment repo should be in a read/write location access
 For example, on Sockeye the first choice if you allocation has it would be to use burst storage, i.e. cd to a path of the form
 
 ```bash
-export JULIA_DEPOT_PATH=/arc/burst/[allocation_code]/[username_in_alloc]/
+/arc/burst/[allocation_code]/[username_in_alloc]/
 ```
 
 A second choice would be to use the scratch space, i.e. cd to a path of the form
 
 ```bash
-export JULIA_DEPOT_PATH=/scratch/[allocation_code]/[username_in_alloc]/
+/scratch/[allocation_code]/[username_in_alloc]/
 ```
 
 

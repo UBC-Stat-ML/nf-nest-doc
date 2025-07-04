@@ -200,9 +200,9 @@ java -version
 
 ## Install Julia
 
-At the time of writing, Julia 1.11 is causing various issues, so 
-install Julia 1.10 using the 
-["Linux and FreeBSD" instructions](https://julialang.org/downloads/platform/#linux_and_freebsd) but 
+You can 
+install Julia using the 
+["Linux and FreeBSD" instructions](https://julialang.org/downloads/platform/#linux_and_freebsd). For example 
 using the URL for the 
 [Long-term support version 1.10.6](https://julialang.org/downloads/#long_term_support_release).
 
