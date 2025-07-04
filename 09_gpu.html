@@ -255,10 +255,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/pkg_gpu.nf </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/pkg_gpu.nf` [high_meitner] DSL2 - revision: 713b74ac4a
-[c6/0f2ec4] Submitted process &gt; instantiate_process
-[f5/8e3d20] Submitted process &gt; precompile_gpu</code></pre>
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/pkg_gpu.nf` [zen_payne] DSL2 - revision: 1db0d8dc5b
+[bb/60b094] Submitted process &gt; instantiate_process
+[98/f80df2] Submitted process &gt; precompile_gpu</code></pre>
 </div>
 </div>
 </section>
@@ -304,20 +304,20 @@ Launching `nf-nest/pkg_gpu.nf` [high_meitner] DSL2 - revision: 713b74ac4a
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/gpu.nf <span class="at">-profile</span> cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/examples/gpu.nf` [peaceful_kalman] DSL2 - revision: 9be41cea49
-[0f/72e522] Submitted process &gt; instantiate_process
-[51/7e9e31] Submitted process &gt; precompile_gpu
-[42/9abc52] Submitted process &gt; run_julia
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/examples/gpu.nf` [suspicious_shannon] DSL2 - revision: 9be41cea49
+[b3/ad92cc] Submitted process &gt; instantiate_process
+[02/164d10] Submitted process &gt; precompile_gpu
+[a6/d78d9b] Submitted process &gt; run_julia
 CPU
- 13.431125 seconds (2.08 M allocations: 331.146 MiB, 3.88% gc time, 12.84% compilation time)
- 11.543825 seconds (2 allocations: 190.735 MiB, 0.18% gc time)
+ 13.212915 seconds (2.08 M allocations: 331.278 MiB, 2.01% gc time, 12.01% compilation time)
+ 11.711777 seconds (2 allocations: 190.735 MiB, 1.72% gc time)
 GPU
-  2.147718 seconds (2.72 M allocations: 186.343 MiB, 2.02% gc time, 97.02% compilation time)
-  0.000703 seconds (71 allocations: 1.625 KiB)
+  2.219103 seconds (2.69 M allocations: 183.856 MiB, 97.33% compilation time)
+  0.000629 seconds (71 allocations: 1.625 KiB)
 CUDA runtime 12.5, artifact installation
-CUDA driver 12.8
-NVIDIA driver 550.144.3
+CUDA driver 12.9
+NVIDIA driver 550.163.1
 
 CUDA libraries: 
 - CUBLAS: 12.5.3
@@ -326,12 +326,12 @@ CUDA libraries:
 - CUSOLVER: 11.6.3
 - CUSPARSE: 12.5.1
 - CUPTI: 2024.2.1 (API 23.0.0)
-- NVML: 12.0.0+550.144.3
+- NVML: 12.0.0+550.163.1
 
 Julia packages: 
-- CUDA: 5.7.3
-- CUDA_Driver_jll: 0.12.1+1
-- CUDA_Runtime_jll: 0.16.1+0
+- CUDA: 5.8.2
+- CUDA_Driver_jll: 0.13.1+0
+- CUDA_Runtime_jll: 0.17.1+0
 
 Toolchain:
 - Julia: 1.10.8

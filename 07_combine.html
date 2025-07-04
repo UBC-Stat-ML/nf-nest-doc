@@ -342,34 +342,34 @@ put csv files.</p>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/full.nf <span class="at">-profile</span> cluster </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/examples/full.nf` [romantic_wing] DSL2 - revision: a68c131baa
-[df/c5a10f] Submitted process &gt; combine_workflow:instantiate_process
-[00/0ab92c] Submitted process &gt; instantiate_process
-[31/97015a] Submitted process &gt; combine_workflow:precompile
-[48/c6c78a] Submitted process &gt; precompile
-[38/327da8] Submitted process &gt; run_julia (3)
-[b4/accae5] Submitted process &gt; run_julia (1)
-[ba/b6f9f9] Submitted process &gt; run_julia (4)
-[82/421652] Submitted process &gt; run_julia (2)
-[d5/404e35] Submitted process &gt; run_julia (5)
-[9d/c5acd5] Submitted process &gt; run_julia (7)
-[bb/c8f236] Submitted process &gt; run_julia (6)
-[e6/a8195d] Submitted process &gt; run_julia (8)
-[df/5456d3] Submitted process &gt; run_julia (9)
-[25/7c66e0] Submitted process &gt; run_julia (10)
-[f1/880a94] Submitted process &gt; run_julia (11)
-[08/c2005a] Submitted process &gt; run_julia (13)
-[33/970057] Submitted process &gt; run_julia (12)
-[f9/d6123a] Submitted process &gt; run_julia (14)
-[fb/913ad5] Submitted process &gt; run_julia (15)
-[20/f4a6b3] Submitted process &gt; run_julia (16)
-[45/72e15b] Submitted process &gt; run_julia (17)
-[8e/8f2ba2] Submitted process &gt; run_julia (18)
-[60/2b6bc0] Submitted process &gt; run_julia (19)
-[54/d8e5b0] Submitted process &gt; run_julia (20)
-[3c/ec105c] Submitted process &gt; combine_workflow:combine_process
-[4c/80d2c6] Submitted process &gt; plot</code></pre>
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/examples/full.nf` [peaceful_planck] DSL2 - revision: a68c131baa
+[7f/c48687] Submitted process &gt; instantiate_process
+[a1/01de97] Submitted process &gt; combine_workflow:instantiate_process
+[62/e5f07c] Submitted process &gt; combine_workflow:precompile
+[18/b3eff4] Submitted process &gt; precompile
+[e1/4a97fb] Submitted process &gt; run_julia (1)
+[94/2bb620] Submitted process &gt; run_julia (12)
+[fd/c65f33] Submitted process &gt; run_julia (8)
+[fe/8349e2] Submitted process &gt; run_julia (5)
+[86/d2188b] Submitted process &gt; run_julia (11)
+[dd/a1da28] Submitted process &gt; run_julia (10)
+[1f/e7cb21] Submitted process &gt; run_julia (7)
+[2e/1f9bba] Submitted process &gt; run_julia (6)
+[df/cd6375] Submitted process &gt; run_julia (9)
+[1b/a2c88c] Submitted process &gt; run_julia (4)
+[78/d434da] Submitted process &gt; run_julia (3)
+[66/9afc5a] Submitted process &gt; run_julia (13)
+[a8/b2cf25] Submitted process &gt; run_julia (2)
+[12/b66506] Submitted process &gt; run_julia (14)
+[6b/75f684] Submitted process &gt; run_julia (16)
+[41/96a420] Submitted process &gt; run_julia (15)
+[9a/bb5545] Submitted process &gt; run_julia (17)
+[0c/fbbb9a] Submitted process &gt; run_julia (20)
+[82/949f45] Submitted process &gt; run_julia (18)
+[99/a84917] Submitted process &gt; run_julia (19)
+[71/2877e4] Submitted process &gt; combine_workflow:combine_process
+[0a/b73e43] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 </section>
@@ -405,19 +405,19 @@ Launching `nf-nest/examples/full.nf` [romantic_wing] DSL2 - revision: a68c131baa
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> deliverables/scriptName=full.nf/runName.txt </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>romantic_wing</code></pre>
+<pre><code>peaceful_planck</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>TIMESTAMP           DURATION    RUN NAME            STATUS  REVISION ID SESSION ID                              COMMAND                                                    
-2025-04-28 22:23:50 2.9s        furious_bhaskara    OK      9d1a692a7e  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/examples/hello.nf                     
-2025-04-28 22:23:56 7.4s        sleepy_cuvier       OK      9d1a692a7e  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/examples/hello.nf -profile cluster    
-2025-04-28 22:25:01 47.1s       pensive_leibniz     OK      fc0374e695  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/pkg.nf -profile cluster               
-2025-04-28 22:26:11 43.2s       gigantic_brown      OK      aa082b1978  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/examples/many_jobs.nf -profile cluster
-2025-04-28 22:26:57 6s          goofy_lattes        OK      d9de661ecc  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/examples/filter.nf                    
-2025-04-28 22:27:09 4m 33s      romantic_wing       OK      a68c131baa  8a9edb72-f01d-44e8-821a-46007329be15    nextflow run nf-nest/examples/full.nf -profile cluster     </code></pre>
+2025-07-03 17:01:17 2.9s        small_rosalind      OK      9d1a692a7e  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/examples/hello.nf                     
+2025-07-03 17:01:23 7.3s        boring_ride         OK      9d1a692a7e  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/examples/hello.nf -profile cluster    
+2025-07-03 17:02:17 1m 18s      romantic_engelbart  OK      fc0374e695  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/pkg.nf -profile cluster               
+2025-07-03 17:03:59 1m 48s      tiny_lagrange       OK      aa082b1978  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/examples/many_jobs.nf -profile cluster
+2025-07-03 17:05:50 5.2s        gigantic_heisenberg OK      d9de661ecc  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/examples/filter.nf                    
+2025-07-03 17:06:01 6m 24s      peaceful_planck     OK      a68c131baa  d108fc2d-a202-40d8-b7ca-4e9fc18872fb    nextflow run nf-nest/examples/full.nf -profile cluster     </code></pre>
 </div>
 </div>
 <p>And we can see in the CSV that indeed the columns <code>seed</code> and <code>n_chains</code> were added to the left:</p>
@@ -425,7 +425,7 @@ Launching `nf-nest/examples/full.nf` [romantic_wing] DSL2 - revision: a68c131baa
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> <span class="at">-n</span> 2 deliverables/scriptName=full.nf/output/summary.csv </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>seed,n_chains,round,n_scans,n_tempered_restarts,global_barrier,global_barrier_variational,last_round_max_time,last_round_max_allocation,stepping_stone
-10,10,1,2,,8.998207738433418,,0.000223134,13536.0,-1173.429270641805</code></pre>
+10,10,1,2,,8.998207738433418,,0.000233774,13536.0,-1173.429270641805</code></pre>
 </div>
 </div>
 

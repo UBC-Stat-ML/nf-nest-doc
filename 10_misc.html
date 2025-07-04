@@ -318,34 +318,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/params.nf <span class="at">-profile</span> cluster <span class="at">--n_rounds</span> 6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/examples/params.nf` [amazing_shaw] DSL2 - revision: 093b673fc8
-[df/c5a10f] Cached process &gt; combine_workflow:instantiate_process
-[00/0ab92c] Cached process &gt; instantiate_process
-[31/97015a] Cached process &gt; combine_workflow:precompile
-[48/c6c78a] Cached process &gt; precompile
-[e9/c1b09a] Submitted process &gt; run_julia (2)
-[07/f95696] Submitted process &gt; run_julia (4)
-[bb/85c049] Submitted process &gt; run_julia (3)
-[b6/92e73b] Submitted process &gt; run_julia (1)
-[62/d93d81] Submitted process &gt; run_julia (5)
-[54/bb2d61] Submitted process &gt; run_julia (6)
-[cb/e5be3f] Submitted process &gt; run_julia (7)
-[90/15f404] Submitted process &gt; run_julia (8)
-[b6/9aef90] Submitted process &gt; run_julia (11)
-[11/6068df] Submitted process &gt; run_julia (9)
-[a9/94191b] Submitted process &gt; run_julia (10)
-[28/ee137b] Submitted process &gt; run_julia (12)
-[02/0dd48f] Submitted process &gt; run_julia (14)
-[e8/217a1b] Submitted process &gt; run_julia (15)
-[6e/a85e04] Submitted process &gt; run_julia (13)
-[59/513709] Submitted process &gt; run_julia (16)
-[47/d3650e] Submitted process &gt; run_julia (18)
-[37/f434dd] Submitted process &gt; run_julia (17)
-[cb/d7ccea] Submitted process &gt; run_julia (19)
-[18/f93f34] Submitted process &gt; run_julia (20)
-[ca/69f4e9] Submitted process &gt; combine_workflow:combine_process
-[02/8377cf] Submitted process &gt; plot</code></pre>
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/examples/params.nf` [deadly_pasteur] DSL2 - revision: 093b673fc8
+[a1/01de97] Cached process &gt; combine_workflow:instantiate_process
+[7f/c48687] Cached process &gt; instantiate_process
+[18/b3eff4] Cached process &gt; precompile
+[62/e5f07c] Cached process &gt; combine_workflow:precompile
+[02/d406f5] Submitted process &gt; run_julia (12)
+[94/86641f] Submitted process &gt; run_julia (2)
+[84/9166ff] Submitted process &gt; run_julia (10)
+[73/859689] Submitted process &gt; run_julia (5)
+[ee/dea556] Submitted process &gt; run_julia (13)
+[2a/fce377] Submitted process &gt; run_julia (8)
+[61/a98f2b] Submitted process &gt; run_julia (4)
+[ff/7b1a68] Submitted process &gt; run_julia (11)
+[5b/d6f5cb] Submitted process &gt; run_julia (1)
+[ae/00a054] Submitted process &gt; run_julia (7)
+[04/d3b4f3] Submitted process &gt; run_julia (3)
+[2d/00705f] Submitted process &gt; run_julia (9)
+[e3/de0446] Submitted process &gt; run_julia (6)
+[43/eda189] Submitted process &gt; run_julia (14)
+[1c/474835] Submitted process &gt; run_julia (15)
+[81/49b08f] Submitted process &gt; run_julia (16)
+[c2/f05ac8] Submitted process &gt; run_julia (17)
+[6c/2f23bd] Submitted process &gt; run_julia (18)
+[11/5a5ed4] Submitted process &gt; run_julia (19)
+[f7/5c018b] Submitted process &gt; run_julia (20)
+[0e/5886b4] Submitted process &gt; combine_workflow:combine_process
+[a6/000d86] Submitted process &gt; plot</code></pre>
 </div>
 </div>
 <p>Notice that the function <code>deliverables(workflow, params)</code> takes it into account so that the deliverables directory is organized correctly:</p>
@@ -417,11 +417,11 @@ Launching `nf-nest/examples/params.nf` [amazing_shaw] DSL2 - revision: 093b673fc
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/dry_run.nf <span class="at">-profile</span> cluster <span class="at">--dryRun</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/examples/dry_run.nf` [goofy_jones] DSL2 - revision: c7304bca14
-[00/0ab92c] Cached process &gt; instantiate_process
-[48/c6c78a] Cached process &gt; precompile
-[e1/80b137] Submitted process &gt; run_julia (1)</code></pre>
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/examples/dry_run.nf` [spontaneous_colden] DSL2 - revision: c7304bca14
+[7f/c48687] Cached process &gt; instantiate_process
+[18/b3eff4] Cached process &gt; precompile
+[a3/b887a1] Submitted process &gt; run_julia (1)</code></pre>
 </div>
 </div>
 </section>
@@ -464,9 +464,9 @@ Launching `nf-nest/examples/dry_run.nf` [goofy_jones] DSL2 - revision: c7304bca1
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> experiment_repo</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./nextflow</span> run nf-nest/examples/includes.nf </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>N E X T F L O W  ~  version 24.10.6
-Launching `nf-nest/examples/includes.nf` [hopeful_leakey] DSL2 - revision: f263a35a46
-[a4/f29e1a] Submitted process &gt; run_julia
+<pre><code>N E X T F L O W  ~  version 25.04.6
+Launching `nf-nest/examples/includes.nf` [loquacious_edison] DSL2 - revision: f263a35a46
+[34/6a94ea] Submitted process &gt; run_julia
 hello
 world</code></pre>
 </div>
